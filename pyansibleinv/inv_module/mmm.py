@@ -39,26 +39,26 @@ def gen_inv(args):
 
     mmm_dict['cluster_id']=cluster_id
     mmm_dict['mon_fqdn']='monitor_vip'
-    mmm_dict['mon_vip']=monitor_vips
+    mmm_dict['mon_vips']=monitor_vips
     mmm_dict['writer_fqdn']='writer_vip'
-    mmm_dict['writer_vip']=writer_vips
+    mmm_dict['writer_vips']=writer_vips
     mmm_dict['reader_fqdn']='reader_vip'
-    mmm_dict['reader_vip']=writer_vips
+    mmm_dict['reader_vips']=reader_vips
 
     for i, host_info in enumerate(monitor_hosts):
         (k, v) = host_info.split(":")
         hosts_script.append('{:<30}{:<30}{}'.format(k, 'ansible_ssh_host='+v, 'ansible_ssh_pass='+password))
-        mmm_dict['mon_host'+str(i)]=k
+        mmm_dict['mon_host'+str(i+1)]=k
 
     for i, host_info in enumerate(data_hosts):
         (k, v) = host_info.split(":")
         hosts_script.append('{:<30}{:<30}{}'.format(k, 'ansible_ssh_host='+v, 'ansible_ssh_pass='+password))
-        mmm_dict['data_host'+str(i)]=k
+        mmm_dict['data_host'+str(i+1)]=k
 
     print('ansible hosts:\n')
     print('\n'.join(hosts_script)+'\n')
     print('ansible playbooks:\n')
-    print(common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),{})+'\n')
+    print(common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),{},'')+'\n')
     print('mmm setting:\n')
-    print(common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mmm_dict)+'\n')
+    print(common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mmm_dict,'')+'\n')
     return None

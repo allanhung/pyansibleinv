@@ -4,7 +4,7 @@ import os
 import pyansibleinv
 from jinja2 import Template
 
-template_dir = os.path.join(os.path.dirname(pyansibleinv.__file__),'inv_templates')
+template_dir = '/usr/share/pyansibleinv'
 
 def render_template(template_str, template_dict, output_file):
     output_str = Template(template_str).render(template_dict) if template_dict else template_str
