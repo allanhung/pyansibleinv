@@ -55,7 +55,7 @@ except ImportError:
         def run(self):
             discover_and_run_tests()
 
-datadir = datadir = os.path.join('share','pyansibleinv')
+datadir = os.path.join('share','pyansibleinv')
 datafiles = [(d, [os.path.join(d,f) for f in files]) for d, folders, files in os.walk(datadir)]
 
 VERSION = '0.1.0'
