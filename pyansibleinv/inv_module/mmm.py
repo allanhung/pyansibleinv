@@ -4,64 +4,61 @@
 generate ansible inventory for mmm
 
 Usage:
-  pyansibleinv mmm [--monitor_vip MONVIP] --data_host DATAHOSTS --monitor_host MONHOSTS --writer_vip WVIP --reader_vip RVIP
+  pyansibleinv mmm [--monitor_vip MONVIP] [--password PASSWORD] --cluster_id CLUSTERID --data_host DATAHOSTS --monitor_host MONHOSTS --writer_vip WVIP --reader_vip RVIP
 
 Arguments:
+  --cluster_id CLUSTERID    MySQL mmm Cluster id
   --data_host DATAHOSTS     MySQL Hosts for mmm (e.q. hostname1:ip1,hostname2:ip2 ...)
   --monitor_host MONHOSTS   Monitor Hosts for mmm (e.q. hostname1:ip1,hostname2:ip2 ...)
   --writer_vip WVIP         Writer vip for mmm (e.q. ip1,ip2 ...)
   --reader_vip RVIP         Reader vip for mmm (e.q. ip1,ip2 ...)
 Options:
   -h --help                 Show this screen.
-  --monitor_vip  MONVIP     Monitor vip for mmm (e.q. ip1,ip2 ...)
+  --monitor_vip MONVIP      Monitor vip for mmm (e.q. ip1,ip2 ...) [default: 192.168.10.1]
+  --password PASSWORD       Host password [default: password]
 """
 
 from docopt import docopt
+import common
+import os
 
 def gen_inv(args):
-    spec_template = 'c-template.spec'
+    playbook_template = 'mmm-playbook.j2'
+    setting_template = 'mmm-setting.j2'
 
-    spec_script = []
-    package_dict = {}
-    package_url=args['<git_hub_url>']
-    package_dict['package_ver']=args['<version>']
-    rpmbuild_root = args['--rpmbuild_root']
+    hosts_script = []
+    hosts_script.append('[mmm]')
+    mmm_dict = {}
+    monitor_vips=args['--monitor_vip'].split(",")
+    password=args['--password']
+    cluster_id=args['--cluster_id']
+    data_hosts=args['--data_host'].split(",")
+    monitor_hosts=args['--monitor_host'].split(",")
+    writer_vips=args['--writer_vip'].split(",")
+    reader_vips=args['--reader_vip'].split(",")
 
-    pattern=re.compile('https://(.*?)/(.*?)/(.*)')
-    match=re.match(pattern, package_url)
-    download_mathod = 'wget' if '/' in match.groups(3) else 'git'
+    mmm_dict['cluster_id']=cluster_id
+    mmm_dict['mon_fqdn']='monitor_vip'
+    mmm_dict['mon_vip']=monitor_vips
+    mmm_dict['writer_fqdn']='writer_vip'
+    mmm_dict['writer_vip']=writer_vips
+    mmm_dict['reader_fqdn']='reader_vip'
+    mmm_dict['reader_vip']=writer_vips
 
-    (package_dict['provider'], package_dict['provider_tld']) = match.group(1).split('.')
-    package_dict['project'] = match.group(2)
-    package_dict['repo'] = match.group(3).split('/')[0].replace('.git','')
-    package_dict['today'] = datetime.datetime.now().strftime("%a %b %d %Y")
+    for i, host_info in enumerate(monitor_hosts):
+        (k, v) = host_info.split(":")
+        hosts_script.append('{:<30}{:<30}{}'.format(k, 'ansible_ssh_host='+v, 'ansible_ssh_pass='+password))
+        mmm_dict['mon_host'+str(i)]=k
 
-    package_ver_var=package_dict['repo'].replace('-','').replace('_','').replace('.','').upper()+'VER'
-    repo_name = package_dict['repo']
-    spec_filename = repo_name+'.spec'
-    repo_filename = package_dict['repo']+'-$'+package_ver_var+'.tar.gz'
-    common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,spec_template))), package_dict, os.path.join(rpmbuild_root, 'SPECS', spec_filename))
+    for i, host_info in enumerate(data_hosts):
+        (k, v) = host_info.split(":")
+        hosts_script.append('{:<30}{:<30}{}'.format(k, 'ansible_ssh_host='+v, 'ansible_ssh_pass='+password))
+        mmm_dict['data_host'+str(i)]=k
 
-    spec_script.append('')
-    spec_script.append('export %s' % package_ver_var+'='+package_dict['package_ver'])
-    if download_mathod == 'git':
-        spec_script.append('cd /usr/local/src')
-        spec_script.append('rm -rf /usr/local/src/'+package_dict['repo']+'-$'+package_ver_var)
-        spec_script.append('git clone --depth=10 '+package_url+' '+package_dict['repo']+'-$'+package_ver_var)
-        spec_script.append('tar -zcf $SRCDIR/'+repo_filename+' '+package_dict['repo']+'-$'+package_ver_var)
-        spec_script.append('cd /usr/local/src/'+package_dict['repo']+'-$'+package_ver_var)
-        spec_script.append('export GITCOMMIT=`git rev-parse HEAD`')
-        spec_script.append('cd ..')
-        spec_script.append('sed -i -e "/^%global/s#%global commit.*#%global commit          $GITCOMMIT#g" $RPMBUILDROOT/SPECS/'+spec_filename)
-    else:
-        spec_script.append('wget -O $SRCDIR/'+repo_filename+' '+package_url)
-        spec_script.append('export GITCOMMIT='+sys.argv[3])
-    spec_script.append('')
-    spec_script.append('/bin/cp -f $RPMBUILDROOT/SPECS/'+spec_filename+' $SPECSDIR/')
-    spec_script.append('/bin/cp -f $SRCDIR/'+repo_filename+' $RPMBUILDROOT/SOURCES/')
-    spec_script.append('/bin/cp -f $SPECSDIR/'+spec_filename+' $RPMBUILDROOT/SPECS/')
-    spec_script.append('rpmbuild -bb $RPMBUILDROOT/SPECS/'+spec_filename)
-    spec_script.append('rm -f $RPMDIR/'+repo_name+'-*')
-    spec_script.append('mv -f $RPMBUILDROOT/RPMS/x86_64/'+repo_name+'-* $RPMDIR')
-    print('\n'.join(spec_script))
+    print('ansible hosts:\n')
+    print('\n'.join(hosts_script)+'\n')
+    print('ansible playbooks:\n')
+    print(common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),{})+'\n')
+    print('mmm setting:\n')
+    print(common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mmm_dict)+'\n')
     return None

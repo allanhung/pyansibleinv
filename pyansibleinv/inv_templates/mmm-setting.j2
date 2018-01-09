@@ -53,7 +53,9 @@ mmm_group:
     {{ cluster_id }}
       monitor_vip:
         {{ mon_fqdn }}:
-          - {{ mon_vip }}
+{% for mip in mon_vips }}
+          - {{ mip }}
+{% endfor %}
       write_vip:
         {{ writer_fqdn }}:
           - {{ writer_vip }}

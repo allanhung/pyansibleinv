@@ -54,6 +54,9 @@ except ImportError:
         def run(self):
             discover_and_run_tests()
 
+datadir = 'inv_templates'
+datafiles = [(d, [os.path.join(d,f) for f in files]) for d, folders, files in os.walk(datadir)]
+
 VERSION = '0.1.0'
 setup(
     name='pyansibleinv',
@@ -64,6 +67,7 @@ setup(
     author_email='hung.allan@gmail.com',
     url='https://github.com/hungallan/pyansibleinv',
     download_url='https://github.com/hungallan/pyansibleinv/tarball/' + VERSION,
+    data_files = datafiles,
     keywords=['utility', 'miscellaneous', 'library'],
     classifiers=[],
     entry_points={                                                                                                                                                                                                                                                             
