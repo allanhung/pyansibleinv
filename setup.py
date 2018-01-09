@@ -1,5 +1,4 @@
 try:
-    import os
     import setuptools
     from setuptools import setup
 except ImportError:
@@ -55,8 +54,7 @@ except ImportError:
         def run(self):
             discover_and_run_tests()
 
-datadir = os.path.join('share','pyansibleinv')
-datafiles = [(d, [os.path.join(d,f) for f in files]) for d, folders, files in os.walk(datadir)]
+import os
 
 VERSION = '0.1.0'
 setup(
@@ -68,7 +66,7 @@ setup(
     author_email='hung.allan@gmail.com',
     url='https://github.com/hungallan/pyansibleinv',
     download_url='https://github.com/hungallan/pyansibleinv/tarball/' + VERSION,
-    data_files = datafiles,
+    data_files = [('share/pyansibleinv', [os.path.join(d,f) for f in files]) for d, folders, files in os.walk('inv_templates')],
     keywords=['utility', 'miscellaneous', 'library'],
     classifiers=[],
     entry_points={                                                                                                                                                                                                                                                             
