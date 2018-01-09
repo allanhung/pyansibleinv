@@ -53,17 +53,17 @@ mmm_group:
     {{ cluster_id }}
       monitor_vip:
         {{ mon_fqdn }}:
-{% for mip in mon_vips -%}
+{%- for mip in mon_vips %}
           - {{ mip }}
 {%- endfor %}
       write_vip:
         {{ writer_fqdn }}:
-{% for wip in writer_vips -%}
+{%- for wip in writer_vips %}
           - {{ wip }}
 {%- endfor %}
       read_vip:
         {{ reader_fqdn }}:
-{% for rip in reader_vips -%}
+{%- for rip in reader_vips %}
           - {{ rip }}
 {%- endfor %}
       hosts:
