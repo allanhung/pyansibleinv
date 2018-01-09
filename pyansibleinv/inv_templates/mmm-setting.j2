@@ -1,0 +1,91 @@
+common_stage:
+  args:
+    type: list
+  default:
+    - proxy
+    - repo
+    - rpm
+    - sysctl
+    - limits
+    - snmpd
+    - ssh
+    - postfix
+    - rsyslog
+
+mmm_stage:
+  args:
+    type: list
+  default:
+    - rpm
+    - conf
+
+mysql_stage:
+  args:
+    type: list
+  hostname:
+    {{ data_host1 }}:
+      - rpm
+      - conf
+      - limits
+      - initdb
+      - databases
+      - users_app
+      - users_base
+      - users_dba
+      - users_mmm
+      - import
+      - replication
+    {{ data_host2 }}:
+      - rpm
+      - conf
+      - limits
+      - initdb
+      - databases
+      - users_app
+      - users_base
+      - users_dba
+      - users_mmm
+      - import
+      - replication
+
+mmm_group:
+  default:
+    {{ cluster_id }}
+      monitor_vip:
+        {{ mon_fqdn }}:
+          - {{ mon_vip }}
+      write_vip:
+        {{ writer_fqdn }}:
+          - {{ writer_vip }}
+{% for wip in writer_ips }}
+          - {{ wip }}
+{% endfor %}
+      read_vip:
+        {{ reader_fqdn }}:
+{% for rip in reader_ips }}
+          - {{ rip }}
+{% endfor %}
+      hosts:
+        - hostname: {{ mon_host1 }}
+          ha_peer: {{ mon_host2 }}
+          role: monitor
+        - hostname: {{ mon_host2 }}
+          ha_peer: {{ mon_host1 }}
+          role: monitor
+        - hostname: {{ data_host1 }}
+          ha_peer: {{ data_host2 }}
+          mmm_host: master1
+          mmm_peer: master2
+          role: master
+        - hostname: {{ data_host2 }}
+          ha_peer: {{ data_host1 }}
+          mmm_host: master2
+          mmm_peer: master1
+          role: master
+
+mysql_replication:
+  hostname:
+    {{ data_host1 }}:
+      master_host: {{ data_host2 }}
+    {{ data_host2 }}:
+      master_host: {{ data_host1 }}
