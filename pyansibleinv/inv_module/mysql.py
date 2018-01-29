@@ -4,7 +4,7 @@
 generate ansible inventory for mysql single instance
 
 Usage:
-  pyansibleinv mysql [--database DATABASE] [--password PASSWORD] [--workdir WORKDIR] --taskid TASKID --hostname HOSTNAME --ip IP
+  pyansibleinv mysql [--database DATABASE] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] --taskid TASKID --hostname HOSTNAME --ip IP
 
 Arguments:
   --hostname HOSTNAME       MySQL single instance hostname
@@ -15,22 +15,14 @@ Options:
   --database DATABASE       Database name create for mysql single instance [default: db1]
   --password PASSWORD       Host password [default: password]
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
+  --sshpass SSHPASS         Ansible ssh password
+  --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
 """
 
 from docopt import docopt
 import common
 import os
 import pyansible.playbooks
-
-filename = '/opt/ansible/hosts'
-try:
-    temp = open(filename, 'w+b')
-    temp.write("[mysql]\n")
-    temp.write("{} ansible_ssh_host={} ansible_connection=local".format(sys.argv[1], sys.argv[2]))
-finally:
-    temp.close()
-
-try:
 
 def gen_inv(args):
     playbook_template = 'mysql-playbook.j2'
@@ -44,10 +36,16 @@ def gen_inv(args):
     mysql_dict['task_id']=args['--taskid']
     mysql_dict['hostname']=args['--hostname']
     mysql_dict['ip']=args['--ip']
+    mysql_dict['ssh_pass']=args['--sshpass']
+    mysql_dict['ssh_key']=args['--sshkey']
     host_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['task_id'],'hosts')
     playbook_filename=os.path.join(mysql_dict['workdir'],'mysql_'+ mysql_dict['task_id']+'.yml')
     setting_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['task_id'],'pillar','mysql.yml')
-    hosts_script.append('{:<30}{:<30}{}'.format(mysql_dict['hostname'], 'ansible_ssh_host='+mysql_dict['ip'], 'ansible_ssh_private_key_file=/opt/ansible/db.pem'))
+    if mysql_dict['sshpass']:
+        ansible_auth='ansible_ssh_pass={}'.format(mysql_dict['ssh_pass']
+    else:
+        ansible_auth='ansible_ssh_private_key_file={}'.format(mysql_dict['ssh_key']
+    hosts_script.append('{:<30}{:<30}{}'.format(mysql_dict['hostname'], 'ansible_ssh_host='+mysql_dict['ip'], ansible_auth))
 
     print('create ansible hosts: {}'.format(host_filename))
     common.render_template('\n'.join(hosts_script),{},host_filename)
