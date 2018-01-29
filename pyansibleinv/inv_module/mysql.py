@@ -20,6 +20,17 @@ Options:
 from docopt import docopt
 import common
 import os
+import pyansible.playbooks
+
+filename = '/opt/ansible/hosts'
+try:
+    temp = open(filename, 'w+b')
+    temp.write("[mysql]\n")
+    temp.write("{} ansible_ssh_host={} ansible_connection=local".format(sys.argv[1], sys.argv[2]))
+finally:
+    temp.close()
+
+try:
 
 def gen_inv(args):
     playbook_template = 'mysql-playbook.j2'
@@ -44,4 +55,7 @@ def gen_inv(args):
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),mysql_dict,playbook_filename)
     print('create mysql single instance setting: {}'.format(setting_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mysql_dict,setting_filename)
+    print('run ansible from python')
+    runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
+    runner.run()
     return None
