@@ -1,9 +1,8 @@
-- name: mysql mmm
-  hosts: mmm
+- name: mysql single instance
+  hosts: all
   external_task_id: {{ task_id }}
   pre_tasks:
     - pillar: {}
   roles:
     - common
-    - mmm
     - mysql

@@ -10,6 +10,9 @@ def render_template(template_str, template_dict, output_file):
     output_str = Template(template_str).render(template_dict) if template_dict else template_str
     # to save the results
     if output_file:
+        directory = os.path.dirname(output_file)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
         with open(output_file, "wb") as f:
             f.write(output_str+'\n')
     else:
