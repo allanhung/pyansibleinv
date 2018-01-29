@@ -41,10 +41,10 @@ def gen_inv(args):
     host_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['task_id'],'hosts')
     playbook_filename=os.path.join(mysql_dict['workdir'],'mysql_'+ mysql_dict['task_id']+'.yml')
     setting_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['task_id'],'pillar','mysql.yml')
-    if mysql_dict['sshpass']:
-        ansible_auth='ansible_ssh_pass={}'.format(mysql_dict['ssh_pass']
+    if mysql_dict['ssh_pass']:
+        ansible_auth='ansible_ssh_pass={}'.format(mysql_dict['ssh_pass'])
     else:
-        ansible_auth='ansible_ssh_private_key_file={}'.format(mysql_dict['ssh_key']
+        ansible_auth='ansible_ssh_private_key_file={}'.format(mysql_dict['ssh_key'])
     hosts_script.append('{:<30}{:<30}{}'.format(mysql_dict['hostname'], 'ansible_ssh_host='+mysql_dict['ip'], ansible_auth))
 
     print('create ansible hosts: {}'.format(host_filename))
