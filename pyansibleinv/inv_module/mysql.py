@@ -4,12 +4,11 @@
 generate ansible inventory for mysql single instance
 
 Usage:
-  pyansibleinv mysql [--database DATABASE] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] --taskid TASKID --hostname HOSTNAME --ip IP
+  pyansibleinv mysql [--database DATABASE] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--taskid TASKID] --hostname HOSTNAME --ip IP
 
 Arguments:
   --hostname HOSTNAME       MySQL single instance hostname
   --ip IP                   MySQL IP
-  --taskid TASKID           Task id for create mysql single instance
 Options:
   -h --help                 Show this screen.
   --database DATABASE       Database name create for mysql single instance [default: db1]
@@ -17,6 +16,7 @@ Options:
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
   --sshpass SSHPASS         Ansible ssh password
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
+  --taskid TASKID           Task id for create mysql single instance
 """
 
 from docopt import docopt
@@ -33,7 +33,10 @@ def gen_inv(args):
     mysql_dict['database']=args['--database']
     mysql_dict['password']=args['--password']
     mysql_dict['workdir']=args['--workdir']
-    mysql_dict['task_id']=args['--taskid']
+    if args['--taskid']:
+        mysql_dict['task_id']='  external_task_id: {}'.format(args['--taskid'])
+    else:
+        mysql_dict['task_id']=''
     mysql_dict['hostname']=args['--hostname']
     mysql_dict['ip']=args['--ip']
     mysql_dict['ssh_pass']=args['--sshpass']
