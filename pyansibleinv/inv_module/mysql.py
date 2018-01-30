@@ -34,14 +34,12 @@ def gen_inv(args):
     mysql_dict['database']=args['--database']
     mysql_dict['password']=args['--password']
     mysql_dict['workdir']=args['--workdir']
-    playbook_filename=''
     if args['--taskid']:
         mysql_dict['task_id']='  external_task_id: {}\n'.format(args['--taskid'])
         mysql_dict['uuid']=args['--taskid']
     else:
         mysql_dict['task_id']=''
         mysql_dict['uuid']=str(uuid.uuid4())
-        playbook_filename=os.path.join(mysql_dict['workdir'],'mysql.yml')
     mysql_dict['hostname']=args['--hostname']
     mysql_dict['ip']=args['--ip']
     mysql_dict['ssh_pass']=args['--sshpass']

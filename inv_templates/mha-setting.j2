@@ -5,10 +5,13 @@ common_stage:
     - proxy
     - repo
     - rpm
+    - grub
+    - ifcfg
     - sysctl
     - limits
     - snmpd
     - ssh
+    - users
     - postfix
     - rsyslog
 
@@ -23,12 +26,21 @@ mysql_stage:
     - databases
     - users_app
     - users_base
-    - import
+    - users_dba
+    - users_mha
+    - replication
+
+mha_stage:
+  args:
+    type: list
+  default:
+    - rpm
+    - ssh
+    - conf
 
 mysql_root:
-  hostname:
-    {{ hostname }}:
-      password: {{ password }}
+  default:
+    password: {{ password }}
 
 mysql_app_user:
   default:
@@ -46,3 +58,16 @@ mysql_database:
     - name: {{ database }}
       collation: utf8mb4_general_ci
       encoding: utf8mb4
+
+mha_group:
+  default:
+    mha:
+{{ mha_group }}
+
+mysql_replication:
+  hostname:
+{{ mysql_replication }}
+
+mha_vip:
+  default:
+    db_vip: {{ db_vip }}

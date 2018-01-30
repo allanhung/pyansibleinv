@@ -1,0 +1,8 @@
+- name: mysql with mha
+  hosts: all
+{{ task_id }}  pre_tasks:
+    - pillar: {}
+  roles:
+    - common
+    - mysql
+    - mha
