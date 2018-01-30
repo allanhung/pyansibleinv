@@ -34,7 +34,7 @@ def gen_inv(args):
     mysql_dict['password']=args['--password']
     mysql_dict['workdir']=args['--workdir']
     if args['--taskid']:
-        mysql_dict['task_id']='  external_task_id: {}'.format(args['--taskid'])
+        mysql_dict['task_id']='  external_task_id: {}\n'.format(args['--taskid'])
     else:
         mysql_dict['task_id']=''
     mysql_dict['hostname']=args['--hostname']
