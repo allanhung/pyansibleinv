@@ -23,6 +23,7 @@ from docopt import docopt
 import common
 import os
 import pyansible.playbooks
+import uuid
 
 def gen_inv(args):
     playbook_template = 'mysql-playbook.j2'
@@ -36,16 +37,18 @@ def gen_inv(args):
     playbook_filename=''
     if args['--taskid']:
         mysql_dict['task_id']='  external_task_id: {}\n'.format(args['--taskid'])
-        playbook_filename=os.path.join(mysql_dict['workdir'],'mysql_'+ args['--taskid']+'.yml')
+        mysql_dict['uuid']=args['--taskid']
     else:
         mysql_dict['task_id']=''
+        mysql_dict['uuid']=str(uuid.uuid4())
         playbook_filename=os.path.join(mysql_dict['workdir'],'mysql.yml')
     mysql_dict['hostname']=args['--hostname']
     mysql_dict['ip']=args['--ip']
     mysql_dict['ssh_pass']=args['--sshpass']
     mysql_dict['ssh_key']=args['--sshkey']
-    host_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['task_id'],'hosts')
-    setting_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['task_id'],'pillar','mysql.yml')
+    playbook_filename=os.path.join(mysql_dict['workdir'],'mysql_'+ mysql_dict['uuid']+'.yml')
+    host_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['uuid'],'hosts')
+    setting_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['uuid'],'pillar','mysql.yml')
     if mysql_dict['ssh_pass']:
         ansible_auth='ansible_ssh_pass={}'.format(mysql_dict['ssh_pass'])
     else:
