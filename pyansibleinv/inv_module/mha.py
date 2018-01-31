@@ -82,7 +82,7 @@ def gen_inv(args):
         if i > 0:
             replication_script.append('    {}:'.format(k))
             replication_script.append('      master_host: {}'.format(master_host))
-            replication_script.append('      master_auto_position: 1'))
+            replication_script.append('      master_auto_position: 1')
 
     mha_dict['mha_group']='\n'.join(mha_group_script)
     mha_dict['mysql_replication']='\n'.join(replication_script)
