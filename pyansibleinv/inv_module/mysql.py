@@ -22,8 +22,8 @@ Options:
 from docopt import docopt
 import common
 import os
-import pyansible.playbooks
 import uuid
+from subprocess import Popen, PIPE
 
 def gen_inv(args):
     playbook_template = 'mysql-playbook.j2'
@@ -59,7 +59,6 @@ def gen_inv(args):
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),mysql_dict,playbook_filename)
     print('create mysql single instance setting: {}'.format(setting_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mysql_dict,setting_filename)
-    print('run ansible from python')
-    runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
-    runner.run()
-    return None
+    print('run ansible from python using subprocess')
+    Popen(['/usr/bin/pyansibleinv','--host',host_filename,'--playbook',playbook_filename], stdout=PIPE, stderr=PIPE, stdin=PIPE)
+    return 'OK'
