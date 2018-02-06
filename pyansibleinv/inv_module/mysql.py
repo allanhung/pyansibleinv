@@ -60,5 +60,5 @@ def gen_inv(args):
     print('create mysql single instance setting: {}'.format(setting_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mysql_dict,setting_filename)
     print('run ansible from python using subprocess')
-    Popen(['/usr/bin/pyansibleinv','--host',host_filename,'--playbook',playbook_filename], stdout=PIPE, stderr=PIPE, stdin=PIPE)
+    Popen(['/usr/bin/pyansibleinv','mysql','--host',host_filename,'--playbook',playbook_filename])
     return 'OK'

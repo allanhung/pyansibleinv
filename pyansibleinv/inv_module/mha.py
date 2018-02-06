@@ -93,5 +93,5 @@ def gen_inv(args):
     print('create mysql with mha setting: {}'.format(setting_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mha_dict,setting_filename)
     print('run ansible from python using subprocess')
-    Popen(['/usr/bin/pyansibleinv','--host',host_filename,'--playbook',playbook_filename], stdout=PIPE, stderr=PIPE, stdin=PIPE)
+    Popen(['/usr/bin/pyansibleinv','mha','--host',host_filename,'--playbook',playbook_filename])
     return 'OK'
