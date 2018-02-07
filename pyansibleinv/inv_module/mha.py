@@ -26,7 +26,7 @@ from docopt import docopt
 import common
 import os
 import uuid
-from subprocess import Popen, PIPE
+import pyansible.playbooks
 
 def gen_inv(args):
     playbook_template = 'mha-playbook.j2'
@@ -92,6 +92,7 @@ def gen_inv(args):
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),mha_dict,playbook_filename)
     print('create mysql with mha setting: {}'.format(setting_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mha_dict,setting_filename)
-    print('run ansible from python using subprocess')
-    Popen(['/usr/bin/pyansibleinv','mha','--host',host_filename,'--playbook',playbook_filename])
-    return 'OK'
+    print('run ansible from python')
+    runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
+    runner.run()
+    return None
