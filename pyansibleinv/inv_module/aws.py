@@ -44,20 +44,20 @@ def gen_inv(args):
     mysql_dict['ssh_key']=args['--sshkey']
     # provision ec2 instance
     terraform_cwd = '/opt/terraform/inventory/aws/us-east-1'
-    terraform_filename = os.patch.join(terraform_cwd,mysql_dict['hostname']+'.tf')
-    print('create terraform file: {}'.format(terraform_filename)
-    common.render_template('\n'.join(hosts_script),{},terraform_filename)   
-    p = subprocess.Popen(['terraform', 'plan'], cwd=terraform_cwd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
+    terraform_filename = os.path.join(terraform_cwd,mysql_dict['hostname']+'.tf')
+    print('create terraform file: {}'.format(terraform_filename))
+    common.render_template('\n'.join(hosts_script),mysql_dict,terraform_filename)   
+    p = Popen(['terraform', 'plan'], cwd=terraform_cwd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
     stdout, stderr = p.communicate()
     if p.returncode > 0:
         print('terraform plan error: '+stderr)
         sys.exit()
-    p = subprocess.Popen(['terraform', 'apply'], cwd=terraform_cwd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
+    p = Popen(['terraform', 'apply'], cwd=terraform_cwd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
     stdout, stderr = p.communicate()
     if p.returncode > 0:
         print('terraform apply error: '+stderr)
         sys.exit()
-    p = subprocess.Popen(['terraform', 'output', 'aws_instance_'+mysql_dict['hostname'].replace("-","_")+'_private_ip'], cwd=terraform_cwd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
+    p = Popen(['terraform', 'output', 'aws_instance_'+mysql_dict['hostname'].replace("-","_")+'_private_ip'], cwd=terraform_cwd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
     stdout, stderr = p.communicate()
     if p.returncode > 0:
         print('terraform output error: '+stderr)
