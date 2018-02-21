@@ -27,6 +27,7 @@ from subprocess import Popen, PIPE
 def gen_inv(args):
     playbook_template = 'mysql-playbook.j2'
     setting_template = 'mysql-setting.j2'
+    ec2_template = 'ec2-instance.j2'
     hosts_script = []
     hosts_script.append('[mysql]')
     mysql_dict = {}
@@ -44,9 +45,9 @@ def gen_inv(args):
     mysql_dict['ssh_key']=args['--sshkey']
     # provision ec2 instance
     terraform_cwd = '/opt/terraform/inventory/aws/us-east-1'
-    terraform_filename = os.path.join(terraform_cwd,mysql_dict['hostname']+'.tf')
+    terraform_filename = os.path.join('ec2-'+terraform_cwd,mysql_dict['hostname']+'.tf')
     print('create terraform file: {}'.format(terraform_filename))
-    common.render_template('\n'.join(hosts_script),mysql_dict,terraform_filename)   
+    common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),mysql_dict,terraform_filename)   
     p = Popen(['terraform', 'plan'], cwd=terraform_cwd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
     stdout, stderr = p.communicate()
     if p.returncode > 0:
