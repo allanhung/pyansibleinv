@@ -1,0 +1,21 @@
+resource "aws_instance" "{{ hostname }}" {
+  ami           = "ami-db48ada1"
+  instance_type = "t2.micro"
+  tags {
+    Name = "{{ hostname }}"
+    sshUser = "centos"
+  }
+  subnet_id = "${aws_subnet.useast1a.id}"
+  key_name = "dcs-virginia"
+  vpc_security_group_ids = [
+    "${aws_security_group.default_policy.id}",
+    "${aws_security_group.mysql.id}"
+  ]
+  volume_tags {
+    Name = "{{ hostname }}_os_disk"
+  }
+}
+
+output "aws_instance_{{ hostname | replace("-","_") }}_private_ip" {
+  value = "${aws_instance.{{ hostname }}.private_ip}"
+}
