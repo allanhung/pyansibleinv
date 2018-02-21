@@ -1,0 +1,49 @@
+common_stage:
+  args:
+    type: list
+  default:
+    - proxy
+    - repo
+    - rpm
+    - sysctl
+    - limits
+
+mysql_stage:
+  args:
+    type: list
+  default:
+    - rpm
+    - conf
+    - limits
+    - initdb
+    - databases
+    - users_app
+    - users_base
+    - import
+
+mysql_root:
+  hostname:
+    {{ hostname }}:
+      password: {{ password }}
+
+mysql_app_user:
+  default:
+    app:
+      - name: root
+        host: '10.%'
+        password: '{{ password }}'
+        priv: '*.*:ALL,GRANT'
+        state: present
+      - name: root
+        host: '172.%'
+        password: '{{ password }}'
+        priv: '*.*:ALL,GRANT'
+        state: present
+
+mysql_database:
+  args:
+    type: list
+  dafault:
+    - name: {{ database }}
+      collation: utf8mb4_general_ci
+      encoding: utf8mb4
