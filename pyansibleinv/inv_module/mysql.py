@@ -22,6 +22,7 @@ Options:
 from docopt import docopt
 import common
 import os
+import time
 import uuid
 import pyansible.playbooks
 
@@ -59,6 +60,9 @@ def gen_inv(args):
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),mysql_dict,playbook_filename)
     print('create mysql single instance setting: {}'.format(setting_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mysql_dict,setting_filename)
+    print('check ssh availability')
+    while not common.check_server(mysql_dict['ip'],22):
+        time.sleep(1)
     print('run ansible from python')
     runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
     runner.run()

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import socket
 import pyansibleinv
 from jinja2 import Template
 

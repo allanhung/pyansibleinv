@@ -25,6 +25,7 @@ Options:
 from docopt import docopt
 import common
 import os
+import time
 import uuid
 import pyansible.playbooks
 
@@ -32,6 +33,7 @@ def gen_inv(args):
     playbook_template = 'mha-playbook.j2'
     setting_template = 'mha-setting.j2'
 
+    ip_list = []
     hosts_script = []
     mha_group_script = []
     replication_script = []
@@ -63,6 +65,7 @@ def gen_inv(args):
 
     for i, host_info in enumerate(monitor_hosts):
         (k, v) = host_info.split(":")
+        ip_list.append(v)
         hosts_script.append('{:<30}{:<30}{}'.format(k, 'ansible_ssh_host='+v, ansible_auth))
         mha_group_script.append('      - hostname: {}'.format(k))
         mha_group_script.append('        role: monitor')
@@ -71,6 +74,7 @@ def gen_inv(args):
     for i, host_info in enumerate(data_hosts):
         (k, v) = host_info.split(":")
         hosts_script.append('{:<30}{:<30}{}'.format(k, 'ansible_ssh_host='+v, ansible_auth))
+        ip_list.append(v)
         mha_group_script.append('      - hostname: {}'.format(k))
         if i == 0:
             master_host=k
@@ -92,6 +96,10 @@ def gen_inv(args):
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),mha_dict,playbook_filename)
     print('create mysql with mha setting: {}'.format(setting_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mha_dict,setting_filename)
+    print('check ssh availability')
+    for check_ip in ip_list:
+        while not common.check_server(check_ip,22):
+            time.sleep(1)
     print('run ansible from python')
     runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
     runner.run()
