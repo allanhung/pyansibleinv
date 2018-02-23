@@ -23,6 +23,8 @@ import common
 import os
 
 def gen_inv(args):
+    log_filename='mmm.log'
+    logger = common.MyLogger('mmm', log_filename).default_logger.logger
     playbook_template = 'mmm-playbook.j2'
     setting_template = 'mmm-setting.j2'
 
@@ -47,18 +49,18 @@ def gen_inv(args):
 
     for i, host_info in enumerate(monitor_hosts):
         (k, v) = host_info.split(":")
-        hosts_script.append('{:<30}{:<30}{}'.format(k, 'ansible_ssh_host='+v, 'ansible_ssh_pass='+password))
+        hosts_script.append('{:<60}{:<60}{}'.format(k, 'ansible_ssh_host='+v, 'ansible_ssh_pass='+password))
         mmm_dict['mon_host'+str(i+1)]=k
 
     for i, host_info in enumerate(data_hosts):
         (k, v) = host_info.split(":")
-        hosts_script.append('{:<30}{:<30}{}'.format(k, 'ansible_ssh_host='+v, 'ansible_ssh_pass='+password))
+        hosts_script.append('{:<60}{:<60}{}'.format(k, 'ansible_ssh_host='+v, 'ansible_ssh_pass='+password))
         mmm_dict['data_host'+str(i+1)]=k
 
-    print('ansible hosts:\n')
-    print('\n'.join(hosts_script)+'\n')
-    print('ansible playbooks:\n')
-    print(common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),{},'')+'\n')
-    print('mmm setting:\n')
-    print(common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mmm_dict,'')+'\n')
+    logger.info('ansible hosts:\n')
+    logger.info('\n'.join(hosts_script)+'\n')
+    logger.info('ansible playbooks:\n')
+    logger.info(common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),{},'')+'\n')
+    logger.info('mmm setting:\n')
+    logger.info(common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mmm_dict,'')+'\n')
     return None

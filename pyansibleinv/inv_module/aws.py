@@ -41,28 +41,30 @@ def gen_inv(args):
     else:
         mysql_dict['task_id']=''
         mysql_dict['uuid']=str(uuid.uuid4())
+    log_filename=os.path.join(mysql_dict['workdir'],'mysql_'+ mysql_dict['uuid']+'.log')
+    logger = common.MyLogger('aws', log_filename).default_logger.logger
     mysql_dict['hostname']='mysql-'+mysql_dict['database']+'-'+mysql_dict['uuid'][:7]
     mysql_dict['ssh_pass']=args['--sshpass']
     mysql_dict['ssh_key']=args['--sshkey']
     # provision ec2 instance
     terraform_cwd = '/opt/terraform/inventory/aws/us-east-1'
     terraform_filename = os.path.join(terraform_cwd,'ec2-'+mysql_dict['hostname']+'.tf')
-    print('create terraform file: {}'.format(terraform_filename))
+    logger.info('create terraform file: {}'.format(terraform_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,ec2_template))),mysql_dict,terraform_filename)   
     p = Popen(['terraform', 'plan'], cwd=terraform_cwd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
     stdout, stderr = p.communicate()
     if p.returncode > 0:
-        print('terraform plan error: '+stderr)
+        logger.error('terraform plan error: '+stderr)
         sys.exit()
     p = Popen(['terraform', 'apply', '-auto-approve'], cwd=terraform_cwd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
     stdout, stderr = p.communicate()
     if p.returncode > 0:
-        print('terraform apply error: '+stderr)
+        logger.error('terraform apply error: '+stderr)
         sys.exit()
     p = Popen(['terraform', 'output', 'aws_instance_'+mysql_dict['hostname'].replace("-","_")+'_private_ip'], cwd=terraform_cwd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
     stdout, stderr = p.communicate()
     if p.returncode > 0:
-        print('terraform output error: '+stderr)
+        logger.error('terraform output error: '+stderr)
         sys.exit()
     else:
         mysql_dict['ip']=stdout.split('\n')[0]
@@ -76,16 +78,16 @@ def gen_inv(args):
     else:
         ansible_auth='ansible_ssh_private_key_file={}'.format(mysql_dict['ssh_key'])
     hosts_script.append('{:<40}{:<40}{:<50} ansible_ssh_user=centos ansible_become=true ansible_become_user=root ansible_become_method=sudo'.format(mysql_dict['hostname']+'.useast1.aws', 'ansible_ssh_host='+mysql_dict['ip'], ansible_auth))
-    print('create ansible hosts: {}'.format(host_filename))
+    logger.info('create ansible hosts: {}'.format(host_filename))
     common.render_template('\n'.join(hosts_script),{},host_filename)
-    print('craete ansible playbooks: {}'.format(playbook_filename))
+    logger.info('craete ansible playbooks: {}'.format(playbook_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),mysql_dict,playbook_filename)
-    print('create mysql single instance setting: {}'.format(setting_filename))
+    logger.info('create mysql single instance setting: {}'.format(setting_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mysql_dict,setting_filename)
-    print('check ssh availability')
+    logger.info('check ssh availability')
     while not common.check_server(mysql_dict['ip'],22):
         time.sleep(1)
-    print('run ansible from python')
+    logger.info('run ansible from python')
     runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
     runner.run()
     return mysql_dict['uuid']

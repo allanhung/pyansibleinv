@@ -1,11 +1,41 @@
 #!/usr/bin/python
 
 import os
+import sys
 import socket
 import pyansibleinv
 from jinja2 import Template
 
 template_dir = '/usr/share/pyansibleinv'
+
+class StreamToLogger(object):
+   """
+   Fake file-like stream object that redirects writes to a logger instance.
+   """
+   def __init__(self, module, log_file, log_level, log_format, log_date_format):
+      self.logger = logging.getLogger(module)
+      self.log_level = log_level
+      self.set_log_level()
+      self.formatter = logging.Formatter(log_format, log_date_format)
+      self.fh = logging.FileHandler(log_file)
+      self.fh.setFormatter(self.formatter)
+      self.logger.addHandler(self.fh)
+      self.linebuf = ''
+
+   def set_log_level(self):
+      self.logger.setLevel(self.log_level)
+
+   def write(self, buf):
+      for line in buf.rstrip().splitlines():
+         self.logger.log(self.log_level, line.rstrip())
+
+class MyLogger(object):
+   def __init__(self, module, log_file, log_level=logging.INFO, log_format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', log_date_format='%Y-%m-%d %H:%M:%S'):
+      self.default_logger = StreamToLogger(module, log_file, log_level, log_format, log_date_format)
+      self.stdout_logger = StreamToLogger(module+'_stdout', log_file, logging.INFO, log_format, log_date_format)
+      sys.stdout = self.stdout_logger
+      self.stderr_logger = StreamToLogger(module+'_stderr', log_file, logging.ERROR, log_format, log_date_format)
+      sys.stderr = self.stderr_logger
 
 def check_server(address, port):
     # Create a TCP socket

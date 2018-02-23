@@ -58,7 +58,8 @@ def gen_inv(args):
         ansible_auth='ansible_ssh_pass={}'.format(mha_dict['ssh_pass'])
     else:
         ansible_auth='ansible_ssh_private_key_file={}'.format(mha_dict['ssh_key'])
-
+    log_filename=os.path.join(mha_dict['workdir'],'mha_'+ mha_dict['uuid']+'.log')
+    logger = common.MyLogger('mha', log_filename).default_logger.logger
     playbook_filename=os.path.join(mha_dict['workdir'],'mha_'+ mha_dict['uuid']+'.yml')
     host_filename=os.path.join(mha_dict['workdir'],'inventory',mha_dict['uuid'],'hosts')
     setting_filename=os.path.join(mha_dict['workdir'],'inventory',mha_dict['uuid'],'pillar','mha.yml')
@@ -66,14 +67,14 @@ def gen_inv(args):
     for i, host_info in enumerate(monitor_hosts):
         (k, v) = host_info.split(":")
         ip_list.append(v)
-        hosts_script.append('{:<30}{:<30}{}'.format(k, 'ansible_ssh_host='+v, ansible_auth))
+        hosts_script.append('{:<60}{:<60}{}'.format(k, 'ansible_ssh_host='+v, ansible_auth))
         mha_group_script.append('      - hostname: {}'.format(k))
         mha_group_script.append('        role: monitor')
 
     master_host=''
     for i, host_info in enumerate(data_hosts):
         (k, v) = host_info.split(":")
-        hosts_script.append('{:<30}{:<30}{}'.format(k, 'ansible_ssh_host='+v, ansible_auth))
+        hosts_script.append('{:<60}{:<60}{}'.format(k, 'ansible_ssh_host='+v, ansible_auth))
         ip_list.append(v)
         mha_group_script.append('      - hostname: {}'.format(k))
         if i == 0:
@@ -90,17 +91,17 @@ def gen_inv(args):
 
     mha_dict['mha_group']='\n'.join(mha_group_script)
     mha_dict['mysql_replication']='\n'.join(replication_script)
-    print('create ansible hosts: {}'.format(host_filename))
+    logger.info('create ansible hosts: {}'.format(host_filename))
     common.render_template('\n'.join(hosts_script),{},host_filename)
-    print('craete ansible playbooks: {}'.format(playbook_filename))
+    logger.info('craete ansible playbooks: {}'.format(playbook_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),mha_dict,playbook_filename)
-    print('create mysql with mha setting: {}'.format(setting_filename))
+    logger.info('create mysql with mha setting: {}'.format(setting_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mha_dict,setting_filename)
-    print('check ssh availability')
+    logger.info('check ssh availability')
     for check_ip in ip_list:
         while not common.check_server(check_ip,22):
             time.sleep(1)
-    print('run ansible from python')
+    logger.info('run ansible from python')
     runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
     runner.run()
     return None
