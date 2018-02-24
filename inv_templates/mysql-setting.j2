@@ -28,7 +28,7 @@ mysql_stage:
 mysql_root:
   hostname:
     {{ hostname }}:
-      password: {{ password }}
+      password: '{{ password }}'
 
 mysql_app_user:
   default:
@@ -42,7 +42,7 @@ mysql_app_user:
 mysql_database:
   args:
     type: list
-  dafault:
+  default:
     - name: {{ database }}
       collation: utf8mb4_general_ci
       encoding: utf8mb4
