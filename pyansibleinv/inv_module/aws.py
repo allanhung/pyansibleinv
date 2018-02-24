@@ -56,11 +56,15 @@ def gen_inv(args):
     if p.returncode > 0:
         logger.error('terraform plan error: '+stderr)
         sys.exit()
+    else:
+        print(stdout)
     p = Popen(['terraform', 'apply', '-auto-approve'], cwd=terraform_cwd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
     stdout, stderr = p.communicate()
     if p.returncode > 0:
         logger.error('terraform apply error: '+stderr)
         sys.exit()
+    else:
+        print(stdout)
     p = Popen(['terraform', 'output', 'aws_instance_'+mysql_dict['hostname'].replace("-","_")+'_private_ip'], cwd=terraform_cwd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
     stdout, stderr = p.communicate()
     if p.returncode > 0:
@@ -68,6 +72,7 @@ def gen_inv(args):
         sys.exit()
     else:
         mysql_dict['ip']=stdout.split('\n')[0]
+        print(stdout)
 
     # post configuration
     playbook_filename=os.path.join(mysql_dict['workdir'],'mysql_'+ mysql_dict['uuid']+'.yml')
