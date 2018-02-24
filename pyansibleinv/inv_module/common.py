@@ -4,9 +4,22 @@ import os
 import sys
 import socket
 import pyansibleinv
+import logging
 from jinja2 import Template
+from datetime import datetime
 
 template_dir = '/usr/share/pyansibleinv'
+
+class MyFormatter(logging.Formatter):
+    converter=datetime.fromtimestamp
+    def formatTime(self, record, datefmt=None):
+        ct = self.converter(record.created)
+        if datefmt:
+            s = ct.strftime(datefmt)
+        else:
+            t = ct.strftime("%Y-%m-%d %H:%M:%S")
+            s = "%s.%03d" % (t, record.msecs)
+        return s
 
 class StreamToLogger(object):
    """
@@ -14,23 +27,29 @@ class StreamToLogger(object):
    """
    def __init__(self, module, log_file, log_level, log_format, log_date_format):
       self.logger = logging.getLogger(module)
-      self.log_level = log_level
-      self.set_log_level()
-      self.formatter = logging.Formatter(log_format, log_date_format)
+      self.set_log_level(log_level)
+      self.formatter = MyFormatter(log_format, log_date_format)
       self.fh = logging.FileHandler(log_file)
       self.fh.setFormatter(self.formatter)
       self.logger.addHandler(self.fh)
       self.linebuf = ''
 
-   def set_log_level(self):
-      self.logger.setLevel(self.log_level)
+   def set_log_level(self, log_level):
+      self.log_level = log_level
+      self.logger.setLevel(log_level)
 
    def write(self, buf):
       for line in buf.rstrip().splitlines():
          self.logger.log(self.log_level, line.rstrip())
 
+   def flush(self):
+      # do notthing for flush
+      pass
+
 class MyLogger(object):
-   def __init__(self, module, log_file, log_level=logging.INFO, log_format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', log_date_format='%Y-%m-%d %H:%M:%S'):
+   def __init__(self, module, log_file, log_level=logging.INFO, log_format='%(asctime)s - %(name)s - %(levelname)5s - %(message)s', log_date_format=None):
+      name_length=str(len(module)+len('stdout')+1)
+      log_format=log_format.replace('%(name)s','%(name)'+name_length+'s')     
       self.default_logger = StreamToLogger(module, log_file, log_level, log_format, log_date_format)
       self.stdout_logger = StreamToLogger(module+'_stdout', log_file, logging.INFO, log_format, log_date_format)
       sys.stdout = self.stdout_logger
