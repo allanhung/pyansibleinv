@@ -47,7 +47,7 @@ class StreamToLogger(object):
       pass
 
 class MyLogger(object):
-   def __init__(self, module, log_file, log_level=logging.INFO, log_format='%(asctime)s - %(name)s - %(levelname)5s - %(message)s', log_date_format=None):
+   def __init__(self, module, log_file, log_level=logging.INFO, log_format='%(asctime)s - pyansibleinv - %(name)s - %(levelname)5s - %(message)s', log_date_format=None):
       name_length=str(len(module)+len('stdout')+1)
       log_format=log_format.replace('%(name)s','%(name)'+name_length+'s')     
       self.default_logger = StreamToLogger(module, log_file, log_level, log_format, log_date_format)

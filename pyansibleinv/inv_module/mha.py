@@ -26,10 +26,12 @@ from docopt import docopt
 import common
 import os
 import time
+from datetime import timedelta
 import uuid
 import pyansible.playbooks
 
 def gen_inv(args):
+    start_time = time.time()
     playbook_template = 'mha-playbook.j2'
     setting_template = 'mha-setting.j2'
 
@@ -104,4 +106,6 @@ def gen_inv(args):
     logger.info('run ansible from python')
     runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
     runner.run()
+    print("--- Total Excution time: %s ---" % str(timedelta(seconds=(time.time() - start_time))))
+    print('You can connect db with:\n    mysql -uroot -p{} -h{} {}'.format(mysql_dict['password'],mysql_dict['ip'],mysql_dict['database']))
     return None

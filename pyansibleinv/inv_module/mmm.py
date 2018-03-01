@@ -21,8 +21,11 @@ Options:
 from docopt import docopt
 import common
 import os
+import time
+from datetime import timedelta
 
 def gen_inv(args):
+    start_time = time.time()
     log_filename='mmm.log'
     logger = common.MyLogger('mmm', log_filename).default_logger.logger
     playbook_template = 'mmm-playbook.j2'
@@ -63,4 +66,6 @@ def gen_inv(args):
     logger.info(common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),{},'')+'\n')
     logger.info('mmm setting:\n')
     logger.info(common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mmm_dict,'')+'\n')
+    print("--- Total Excution time: %s ---" % str(timedelta(seconds=(time.time() - start_time))))
+    print('You can connect db with:\n    mysql -uroot -p{} -h{} {}'.format(mysql_dict['password'],mysql_dict['ip'],mysql_dict['database']))
     return None

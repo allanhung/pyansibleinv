@@ -21,11 +21,13 @@ import common
 import os
 import sys
 import time
+from datetime import timedelta
 import uuid
 import pyansible.playbooks
 from subprocess import Popen, PIPE
 
 def gen_inv(args):
+    start_time = time.time()
     playbook_template = 'mysql-playbook.j2'
     setting_template = 'mysql-setting-aws.j2'
     ec2_template = 'ec2-instance.j2'
@@ -95,4 +97,6 @@ def gen_inv(args):
     logger.info('run ansible from python')
     runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
     runner.run()
-    return mysql_dict['uuid']
+    print("--- Total Excution time: %s ---" % str(timedelta(seconds=(time.time() - start_time))))
+    print('You can connect db with:\n    mysql -uroot -p{} -h{} {}'.format(mysql_dict['password'],mysql_dict['ip'],mysql_dict['database']))
+    return None
