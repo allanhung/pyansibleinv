@@ -4,7 +4,7 @@
 generate ansible inventory for mysql single instance
 
 Usage:
-  pyansibleinv aws [--database DATABASE] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--taskid TASKID]
+  pyansibleinv aws [--database DATABASE] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID]
 
 Options:
   -h --help                 Show this screen.
@@ -13,6 +13,7 @@ Options:
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
   --sshpass SSHPASS         Ansible ssh password
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
+  --ssh_try_limit SSHLIMIT  Wait time for ssh reachable [default: 1800]
   --taskid TASKID           Task id for create mysql single instance
 """
 
@@ -49,6 +50,7 @@ def gen_inv(args):
     mysql_dict['hostname']='mysql-'+mysql_dict['database'].lower()+'-'+mysql_dict['uuid'][:7]
     mysql_dict['ssh_pass']=args['--sshpass']
     mysql_dict['ssh_key']=args['--sshkey']
+    mysql_dict['ssh_try_limit']=args['--ssh_try_limit']
     # provision ec2 instance
     terraform_cwd = '/opt/terraform/inventory/aws/us-east-1'
     terraform_filename = os.path.join(terraform_cwd,'ec2-'+mysql_dict['hostname']+'.tf')
@@ -93,8 +95,12 @@ def gen_inv(args):
     logger.info('create mysql single instance setting: {}'.format(setting_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mysql_dict,setting_filename)
     logger.info('check ssh availability')
-    while not common.check_server(mysql_dict['ip'],22):
+    i=1
+    while (not common.check_server(mysql_dict['ip'],22)) and (i < mysql_dict['ssh_try_limit']) :
         time.sleep(1)
+        i+=1
+    if (not common.check_server(mysql_dict['ip'],22)):
+        logger.info('ssh check limit exceed ({} sec): ip {}'.format(mysql_dict['ssh_try_limit'], mysql_dict['ip']))
     logger.info('run ansible from python')
     runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
     runner.run()

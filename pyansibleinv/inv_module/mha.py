@@ -4,7 +4,7 @@
 generate ansible inventory for mha
 
 Usage:
-  pyansibleinv mha [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--taskid TASKID] --cluster_id CLUSTERID --data_host DATAHOSTS --monitor_host MONHOSTS --db_vip DBVIP
+  pyansibleinv mha [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] --cluster_id CLUSTERID --data_host DATAHOSTS --monitor_host MONHOSTS --db_vip DBVIP
 
 Arguments:
   --cluster_id CLUSTERID    MySQL mha Cluster id
@@ -19,6 +19,7 @@ Options:
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
   --sshpass SSHPASS         Ansible ssh password
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
+  --ssh_try_limit SSHLIMIT  Wait time for ssh reachable [default: 1800]
   --taskid TASKID           Task id for create mysql single instance
 """
 
@@ -49,6 +50,7 @@ def gen_inv(args):
     mha_dict['db_vip']=args['--db_vip']
     mha_dict['ssh_pass']=args['--sshpass']
     mha_dict['ssh_key']=args['--sshkey']
+    mha_dict['ssh_try_limit']=args['--ssh_try_limit']
     mha_dict['workdir']=args['--workdir']
     if args['--taskid']:
         mha_dict['task_id']='  external_task_id: {}\n'.format(args['--taskid'])
@@ -103,9 +105,15 @@ def gen_inv(args):
     logger.info('create mysql with mha setting: {}'.format(setting_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mha_dict,setting_filename)
     logger.info('check ssh availability')
+    i=1
     for check_ip in ip_list:
-        while not common.check_server(check_ip,22):
+        while (not common.check_server(check_ip,22)) and (i < mha_dict['ssh_try_limit']) :
             time.sleep(1)
+            i+=1
+    for check_ip in ip_list:
+        if (not common.check_server(check_ip,22)):
+            logger.info('ssh check limit exceed ({} sec): ip {}'.format(mha_dict['ssh_try_limit'], check_ip))
+
     logger.info('run ansible from python')
     runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
     runner.run()
