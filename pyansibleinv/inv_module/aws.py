@@ -45,7 +45,8 @@ def gen_inv(args):
         mysql_dict['uuid']=str(uuid.uuid4())
     log_filename=os.path.join(mysql_dict['workdir'],'mysql_'+ mysql_dict['uuid']+'.log')
     logger = common.MyLogger('aws', log_filename).default_logger.logger
-    mysql_dict['hostname']='mysql-'+mysql_dict['database']+'-'+mysql_dict['uuid'][:7]
+    logger.info('args:'+str(args))
+    mysql_dict['hostname']='mysql-'+mysql_dict['database'].lower()+'-'+mysql_dict['uuid'][:7]
     mysql_dict['ssh_pass']=args['--sshpass']
     mysql_dict['ssh_key']=args['--sshkey']
     # provision ec2 instance

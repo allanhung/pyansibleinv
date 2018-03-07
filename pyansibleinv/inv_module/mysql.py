@@ -45,7 +45,8 @@ def gen_inv(args):
         mysql_dict['uuid']=str(uuid.uuid4())
     log_filename=os.path.join(mysql_dict['workdir'],'mysql_'+ mysql_dict['uuid']+'.log')
     logger = common.MyLogger('mysql', log_filename).default_logger.logger
-    mysql_dict['hostname']=args['--hostname']
+    logger.info('args:'+str(args))
+    mysql_dict['hostname']=args['--hostname'].lower()
     mysql_dict['ip']=args['--ip']
     mysql_dict['ssh_pass']=args['--sshpass']
     mysql_dict['ssh_key']=args['--sshkey']

@@ -20,6 +20,7 @@ import common
 def gen_inv(args):
     log_filename='playbook.log'
     logger = common.MyLogger('playbook', log_filename).default_logger.logger
+    logger.info('args:'+str(args))
     ansible_dict = {}
     ansible_dict['host']=args['--host']
     ansible_dict['playbook']=args['--playbook']

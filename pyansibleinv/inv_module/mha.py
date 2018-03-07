@@ -62,12 +62,14 @@ def gen_inv(args):
         ansible_auth='ansible_ssh_private_key_file={}'.format(mha_dict['ssh_key'])
     log_filename=os.path.join(mha_dict['workdir'],'mha_'+ mha_dict['uuid']+'.log')
     logger = common.MyLogger('mha', log_filename).default_logger.logger
+    logger.info('args:'+str(args))
     playbook_filename=os.path.join(mha_dict['workdir'],'mha_'+ mha_dict['uuid']+'.yml')
     host_filename=os.path.join(mha_dict['workdir'],'inventory',mha_dict['uuid'],'hosts')
     setting_filename=os.path.join(mha_dict['workdir'],'inventory',mha_dict['uuid'],'pillar','mha.yml')
 
     for i, host_info in enumerate(monitor_hosts):
         (k, v) = host_info.split(":")
+        k=k.lower()
         ip_list.append(v)
         hosts_script.append('{:<60}{:<60}{}'.format(k, 'ansible_ssh_host='+v, ansible_auth))
         mha_group_script.append('      - hostname: {}'.format(k))
@@ -76,6 +78,7 @@ def gen_inv(args):
     master_host=''
     for i, host_info in enumerate(data_hosts):
         (k, v) = host_info.split(":")
+        k=k.lower()
         hosts_script.append('{:<60}{:<60}{}'.format(k, 'ansible_ssh_host='+v, ansible_auth))
         ip_list.append(v)
         mha_group_script.append('      - hostname: {}'.format(k))

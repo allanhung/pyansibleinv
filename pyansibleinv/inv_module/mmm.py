@@ -28,6 +28,7 @@ def gen_inv(args):
     start_time = time.time()
     log_filename='mmm.log'
     logger = common.MyLogger('mmm', log_filename).default_logger.logger
+    logger.info('args:'+str(args))
     playbook_template = 'mmm-playbook.j2'
     setting_template = 'mmm-setting.j2'
 
@@ -52,11 +53,13 @@ def gen_inv(args):
 
     for i, host_info in enumerate(monitor_hosts):
         (k, v) = host_info.split(":")
+        k=k.lower()
         hosts_script.append('{:<60}{:<60}{}'.format(k, 'ansible_ssh_host='+v, 'ansible_ssh_pass='+password))
         mmm_dict['mon_host'+str(i+1)]=k
 
     for i, host_info in enumerate(data_hosts):
         (k, v) = host_info.split(":")
+        k=k.lower()
         hosts_script.append('{:<60}{:<60}{}'.format(k, 'ansible_ssh_host='+v, 'ansible_ssh_pass='+password))
         mmm_dict['data_host'+str(i+1)]=k
 
