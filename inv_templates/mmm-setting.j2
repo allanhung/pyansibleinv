@@ -50,7 +50,7 @@ mysql_stage:
 
 mmm_group:
   default:
-    {{ cluster_id }}
+    {{ cluster_id }}:
       monitor_vip:
         {{ mon_fqdn }}:
 {%- for mip in mon_vips %}
