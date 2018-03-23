@@ -87,7 +87,7 @@ def gen_inv(args):
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),mmm_dict,playbook_filename)
     logger.info('create mysql with mmm setting: {}'.format(setting_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mmm_dict,setting_filename)
-    print('You can run ansible-playbook -i {} {}'.format(host_filename, playbook_filename)
+    print('You can run ansible-playbook -i {} {}'.format(host_filename, playbook_filename))
     print("--- Total Excution time: %s ---" % str(timedelta(seconds=(time.time() - start_time))))
     print('You can connect db with:\n    mysql -uroot -p{} -h{}'.format(mmm_dict['password'],mmm_dict['writer_vips'][0]))
     return None
