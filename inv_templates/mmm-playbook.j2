@@ -1,6 +1,6 @@
 - name: mysql mmm
   hosts: mmm
-  external_task_id: {{ task_id }}
+{{ task_id }}  pre_tasks:
   pre_tasks:
     - pillar: {}
   roles:

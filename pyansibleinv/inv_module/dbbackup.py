@@ -1,22 +1,17 @@
 #!/usr/bin/python
 
 """
-generate ansible inventory for mha
+database backup scheduler setting
 
 Usage:
-  pyansibleinv mha [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] --cluster_id CLUSTERID --data_host DATAHOSTS --monitor_host MONHOSTS --db_vip DBVIP
+  pyansibleinv dbbackup [--db_host DBHOSTS] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] --dbtype DBTYPE --dbfqdn DBFQDN
 
 Arguments:
-  --cluster_id CLUSTERID    MySQL mha Cluster id
-  --data_host DATAHOSTS     MySQL Hosts for mha (e.q. hostname1:ip1,hostname2:ip2 ...)
-  --monitor_host MONHOSTS   Monitor Hosts for mha (e.q. hostname1:ip1,hostname2:ip2 ...)
-  --db_vip WVIP             DB vip for mha (e.q. 192.168.10.2)
+  --dbtype                  Database type (e.q. mysql, mysql_mha, mssql, mssql_alwayson)
+  --dbfqdn                  Database FQDN (e.q. FQDN or FQDN:IP)
 Options:
   -h --help                 Show this screen.
-  --monitor_vip MONVIP      Monitor vip for mha (e.q. 192.168.10.1) [default: 192.168.10.1]
-  --database DATABASE       Database name create for mysql [default: db1]
-  --password PASSWORD       database password [default: password]
-  --workdir WORKDIR         Working Directory [default: /opt/ansible]
+  --db_host DBHOSTS         Hosts for database (e.q. hostname1:ip1,hostname2:ip2 ...)
   --sshpass SSHPASS         Ansible ssh password
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
   --ssh_try_limit SSHLIMIT  Wait time for ssh reachable [default: 1800]
@@ -118,5 +113,5 @@ def gen_inv(args):
     runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
     runner.run()
     print("--- Total Excution time: %s ---" % str(timedelta(seconds=(time.time() - start_time))))
-    print('You can connect db with:\n    mysql -uroot -p{} -h{} {}'.format(mha_dict['password'],mha_dict['ip'],mha_dict['database']))
+    print('You can connect db with:\n    mysql -uroot -p{} -h{} {}'.format(mysql_dict['password'],mysql_dict['ip'],mysql_dict['database']))
     return None
