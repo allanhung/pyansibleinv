@@ -93,9 +93,12 @@ mha_vip:
 parted:
   args:
     type: list
-  default:
-    - device: /dev/sdb
-      number: 1
+  hostname:
+{%- for dhost in data_hostlist %}
+    {{ dhost }}:
+      - device: /dev/sdb
+        number: 1
+{%- endfor %}
 
 mkfs:
   args:
@@ -113,11 +116,14 @@ nfs_pkgs:
 mount:
   args:
     type: list
-  default:
-    - path: /data
-      src: /dev/sdb1
-      fstype: ext4
-    - path: /dbbackup
-      src: "nfs:/mnt/CVBackup"
-      fstype: nfs
-      opts: rw,bg,hard,intr,rsize=32768,wsize=32768,vers=3,proto=tcp,timeo=600,retrans=2
+  hostname:
+{%- for dhost in data_hostlist %}
+    {{ dhost }}:
+      - path: /data
+        src: /dev/sdb1
+        fstype: ext4
+      - path: /dbbackup
+        src: "nfs:/mnt/CVBackup"
+        fstype: nfs
+        opts: rw,bg,hard,intr,rsize=32768,wsize=32768,vers=3,proto=tcp,timeo=600,retrans=2
+{%- endfor %}
