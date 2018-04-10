@@ -88,9 +88,11 @@ def gen_inv(args):
         mha_group_script.append('        role: monitor')
 
     master_host=''
+    mha_dict['data_hostlist']=[]
     for i, host_info in enumerate(mha_dict['data_hosts']):
         (k, v) = host_info.split(":")
         k=k.lower()
+        mha_dict['data_hostlist'].append(k)
         hosts_script.append('{:<60}{:<60}{}'.format(k, 'ansible_ssh_host='+v, ansible_auth))
         ip_list.append(v)
         mha_group_script.append('      - hostname: {}'.format(k))

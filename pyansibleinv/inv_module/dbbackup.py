@@ -4,7 +4,10 @@
 database backup scheduler setting
 
 Usage:
-  pyansibleinv dbbackup [--db_host DBHOSTS] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] --dbtype DBTYPE --dbfqdn DBFQDN
+  pyansibleinv dbbackup enable [--db_host DBHOSTS] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] --dbtype DBTYPE --dbfqdn DBFQDN
+  pyansibleinv dbbackup disable [--db_host DBHOSTS] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] --dbtype DBTYPE --dbfqdn DBFQDN
+  pyansibleinv dbbackup status [--db_host DBHOSTS] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] --dbtype DBTYPE --dbfqdn DBFQDN
+  pyansibleinv dbbackup list [--db_host DBHOSTS] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] --dbtype DBTYPE --dbfqdn DBFQDN
 
 Arguments:
   --dbtype                  Database type (e.q. mysql, mysql_mha, mssql, mssql_alwayson)
