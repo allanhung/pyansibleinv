@@ -5,6 +5,8 @@ common_stage:
     - proxy
     - repo
     - rpm
+    - grub
+    - ifcfg
     - sysctl
     - limits
     - snmpd
@@ -23,7 +25,24 @@ mysql_stage:
     - databases
     - users_app
     - users_base
+    - users_dba
+    - users_vtr
     - import
+
+mysql_backup_stage:
+  args:
+    type: list
+  default:
+    - conf
+    - cron
+
+parted_stage:
+  args:
+    type: list
+  default:
+    - parted
+    - rpm
+    - mount
 
 mysql_root:
   hostname:

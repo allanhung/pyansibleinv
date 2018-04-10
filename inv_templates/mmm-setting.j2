@@ -23,7 +23,8 @@ mysql_stage:
   args:
     type: list
   hostname:
-    {{ data_host1 }}:
+{%- for dhost in data_hosts %}
+    {{ dhost }}:
       - rpm
       - conf
       - limits
@@ -33,20 +34,31 @@ mysql_stage:
       - users_base
       - users_dba
       - users_mmm
-      - import
+      - users_vtr
       - replication
-    {{ data_host2 }}:
-      - rpm
-      - conf
-      - limits
-      - initdb
-      - databases
-      - users_app
-      - users_base
-      - users_dba
-      - users_mmm
-      - import
-      - replication
+{%- endfor %}
+
+mysql_backup_stage:
+  args:
+    type: list
+  default:
+    - conf
+    - cron
+
+parted_stage:
+  args:
+    type: list
+  default:
+    - parted
+    - rpm
+    - mount
+
+mysql_backup_stage:
+  args:
+    type: list
+  default:
+    - conf
+    - cron
 
 mmm_group:
   default:

@@ -1,0 +1,19 @@
+nxlog_stage:
+  default:
+    mysql:
+      - rpm
+      - conf_mysql
+    mssql:
+      - msi
+      - conf_mssql
+    mongo:
+      - rpm
+      - conf_mongo
+
+hostgroup:
+  default:
+    {{ hostgroup }}:
+{%- for dhost in data_hosts %}
+      - {{ dhost }}
+{%- endfor %}
+      

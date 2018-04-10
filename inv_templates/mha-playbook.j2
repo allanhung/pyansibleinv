@@ -3,6 +3,6 @@
 {{ task_id }}  pre_tasks:
     - pillar: {}
   roles:
-    - common
+    - common{{ parted }}
     - mysql
-    - mha
+    - mha{{ backup }}

@@ -49,6 +49,8 @@ def gen_inv(args):
     mmm_dict['reader_fqdn']='reader_vip'
     mmm_dict['reader_vips']=args['--reader_vip'].split(",")
     mmm_dict['monitor_hosts']=args['--monitor_host'].split(",")
+    if len( mmm_dict['monitor_hosts']) == 1:
+         mmm_dict['monitor_hosts'].append('fakehost.domain:192.168.98.98')
     mmm_dict['data_hosts']=args['--data_host'].split(",")
     mmm_dict['workdir']=args['--workdir']
     mmm_dict['ssh_pass']=args['--sshpass']

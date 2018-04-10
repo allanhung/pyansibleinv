@@ -1,9 +1,9 @@
 - name: mysql mmm
   hosts: mmm
 {{ task_id }}  pre_tasks:
-  pre_tasks:
     - pillar: {}
   roles:
     - common
     - mmm
     - mysql
+    - mysql_backup

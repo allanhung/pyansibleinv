@@ -17,17 +17,21 @@ common_stage:
 mysql_stage:
   args:
     type: list
-  default:
-    - rpm
-    - conf
-    - limits
-    - initdb
-    - databases
-    - users_app
-    - users_base
-    - users_dba
-    - users_mha
-    - replication
+  hostname:
+{%- for dhost in data_hosts %}
+    {{ dhost }}:
+      - rpm
+      - conf
+      - limits
+      - initdb
+      - databases
+      - users_app
+      - users_base
+      - users_dba
+      - users_mha
+      - users_vtr
+      - replication
+{%- endfor %}
 
 mha_stage:
   args:
@@ -36,6 +40,21 @@ mha_stage:
     - rpm
     - ssh
     - conf
+
+mysql_backup_stage:
+  args:
+    type: list
+  default:
+    - conf
+    - cron
+
+parted_stage:
+  args:
+    type: list
+  default:
+    - parted
+    - rpm
+    - mount
 
 mysql_root:
   default:
@@ -70,3 +89,35 @@ mysql_replication:
 mha_vip:
   default:
     db_vip: {{ db_vip }}
+
+parted:
+  args:
+    type: list
+  default:
+    - device: /dev/sdb
+      number: 1
+
+mkfs:
+  args:
+    type: list
+  default:
+    - device: /dev/sdb1
+      fstype: ext4
+
+nfs_pkgs:
+  args:
+    type: list
+  default:
+    - nfs-utils
+
+mount:
+  args:
+    type: list
+  default:
+    - path: /data
+      src: /dev/sdb1
+      fstype: ext4
+    - path: /dbbackup
+      src: "nfs:/mnt/CVBackup"
+      fstype: nfs
+      opts: rw,bg,hard,intr,rsize=32768,wsize=32768,vers=3,proto=tcp,timeo=600,retrans=2
