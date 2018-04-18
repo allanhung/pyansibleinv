@@ -79,16 +79,18 @@ def gen_inv(args):
     host_filename=os.path.join(mha_dict['workdir'],'inventory',mha_dict['uuid'],'hosts')
     setting_filename=os.path.join(mha_dict['workdir'],'inventory',mha_dict['uuid'],'pillar','mha.yml')
 
+    mha_dict['data_hostlist']=[]
+    mha_dict['mha_hostlist']=[]
     for i, host_info in enumerate(mha_dict['monitor_hosts']):
         (k, v) = host_info.split(":")
         k=k.lower()
+        mha_dict['mha_hostlist'].append(k)
         ip_list.append(v)
         hosts_script.append('{:<60}{:<60}{}'.format(k, 'ansible_ssh_host='+v, ansible_auth))
         mha_group_script.append('      - hostname: {}'.format(k))
         mha_group_script.append('        role: monitor')
 
     master_host=''
-    mha_dict['data_hostlist']=[]
     for i, host_info in enumerate(mha_dict['data_hosts']):
         (k, v) = host_info.split(":")
         k=k.lower()

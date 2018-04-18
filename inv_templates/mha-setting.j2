@@ -18,8 +18,13 @@ mysql_stage:
   args:
     type: list
   hostname:
+{%- for mhost in mha_hostlist %}
+    {{ mhost }}:
+      - common
+{%- endfor %}
 {%- for dhost in data_hostlist %}
     {{ dhost }}:
+      - common
       - rpm
       - conf
       - limits

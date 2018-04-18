@@ -12,6 +12,16 @@ common_stage:
     - postfix
     - rsyslog
 
+heartbeat_stage:
+  args:
+    type: list
+  hostname:
+{%- for mhost in mmm_hostlist %}
+    {{ mhost }}:
+      - rpm
+      - conf
+{%- endfor %}
+
 mmm_stage:
   args:
     type: list
@@ -23,8 +33,13 @@ mysql_stage:
   args:
     type: list
   hostname:
-{%- for dhost in data_hosts %}
+{%- for mhost in mmm_hostlist %}
+    {{ mhost }}:
+      - common
+{%- endfor %}
+{%- for dhost in data_hostlist %}
     {{ dhost }}:
+      - common
       - rpm
       - conf
       - limits
@@ -65,9 +80,7 @@ mmm_group:
     {{ cluster_id }}:
       monitor_vip:
         {{ mon_fqdn }}:
-{%- for mip in mon_vips %}
-          - {{ mip }}
-{%- endfor %}
+          - {{ monitor_vip }}
       write_vip:
         {{ writer_fqdn }}:
 {%- for wip in writer_vips %}

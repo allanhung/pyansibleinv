@@ -14,7 +14,7 @@ Arguments:
   --reader_vip RVIP         Reader vip for mmm (e.q. ip1,ip2 ...)
 Options:
   -h --help                 Show this screen.
-  --monitor_vip MONVIP      Monitor vip for mmm (e.q. ip1,ip2 ...) [default: 192.168.10.1]
+  --monitor_vip MONVIP      Monitor vip for mmm (e.q. ip) [default: 192.168.10.1]
   --password PASSWORD       Host password [default: password]
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
   --sshpass SSHPASS         Ansible ssh password
@@ -43,7 +43,8 @@ def gen_inv(args):
     mmm_dict['password']=args['--password']
     mmm_dict['cluster_id']=args['--cluster_id']
     mmm_dict['mon_fqdn']='monitor_vip'
-    mmm_dict['mon_vips']=args['--monitor_vip'].split(",")
+    mmm_dict['monitor_vip']=args['--monitor_vip']
+    mmm_dict['heartbeat']='' if mmm_dict['monitor_vip'] == '192.168.10.1' else '\n    - heartbeat'
     mmm_dict['writer_fqdn']='writer_vip'
     mmm_dict['writer_vips']=args['--writer_vip'].split(",")
     mmm_dict['reader_fqdn']='reader_vip'
@@ -71,15 +72,19 @@ def gen_inv(args):
     host_filename=os.path.join(mmm_dict['workdir'],'inventory',mmm_dict['uuid'],'hosts')
     setting_filename=os.path.join(mmm_dict['workdir'],'inventory',mmm_dict['uuid'],'pillar','mmm.yml')
 
+    mmm_dict['data_hostlist']=[]
+    mmm_dict['mmm_hostlist']=[]
     for i, host_info in enumerate(mmm_dict['monitor_hosts']):
         (k, v) = host_info.split(":")
         k=k.lower()
+        mmm_dict['mmm_hostlist'].append(k)
         hosts_script.append('{:<60}{:<60}{}'.format(k, 'ansible_ssh_host='+v, ansible_auth))
         mmm_dict['mon_host'+str(i+1)]=k
 
     for i, host_info in enumerate(mmm_dict['data_hosts']):
         (k, v) = host_info.split(":")
         k=k.lower()
+        mmm_dict['data_hostlist'].append(k)
         hosts_script.append('{:<60}{:<60}{}'.format(k, 'ansible_ssh_host='+v, ansible_auth))
         mmm_dict['data_host'+str(i+1)]=k
 
