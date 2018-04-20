@@ -25,11 +25,15 @@ def main():
     """
     args = docopt(__doc__, options_first=True)
     module = args['<module>']
+    default_func = 'gen_inv'
     func = args['<func>']
     argv = [module, func]+args['<args>']
     module_script = getattr(inv_module, module)
     module_args = docopt(module_script.__doc__, argv=argv)
-    return getattr(module_script, 'gen_inv')(module_args)
+    if func in dir(module_script):
+        return getattr(module_script, func)(module_args)
+    else:
+        return getattr(module_script, default_func)(module_args)
 
 if __name__ == '__main__':
     main()

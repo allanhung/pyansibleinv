@@ -4,13 +4,14 @@
 generate ansible inventory for mysql single instance
 
 Usage:
-  pyansibleinv mysql [--database DATABASE] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--template_only] --hostname HOSTNAME --ip IP
+  pyansibleinv mysql [--database DATABASE] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--cluster_id CLUSTERID] [--taskid TASKID] [--template_only] --hostname HOSTNAME --ip IP
 
 Arguments:
   --hostname HOSTNAME       MySQL single instance hostname
   --ip IP                   MySQL IP
 Options:
   -h --help                 Show this screen.
+  --cluster_id CLUSTERID    MySQL mha Cluster id
   --database DATABASE       Database name create for mysql single instance [default: db1]
   --password PASSWORD       Host password [default: password]
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
