@@ -119,6 +119,7 @@ def dbbackup(args, func_type):
             cmd = 'data show --playbook %s mybak_%s -f json' % (backup_dict['uuid'], host_info)
             aracli.run(cmd.split(' '))
             result_dict[host_info] = json.loads(cli_result.getvalue())
+    print(result_dict)
     return result_dict
 
 def enable(args):
