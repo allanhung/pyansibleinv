@@ -19,7 +19,7 @@ Options:
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
   --sshpass SSHPASS         Ansible ssh password
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
-  --ssh_try_limit SSHLIMIT  Wait time for ssh reachable [default: 1800]
+  --ssh_try_limit SSHLIMIT  Wait time for ssh reachable [default: 600]
   --taskid TASKID           Task id for create mysql single instance
   --template_only           Generate template only
   --without_parted          without partition and format disk
@@ -55,7 +55,7 @@ def gen_inv(args):
     mha_dict['db_vip']=args['--db_vip']
     mha_dict['ssh_pass']=args['--sshpass']
     mha_dict['ssh_key']=args['--sshkey']
-    mha_dict['ssh_try_limit']=args['--ssh_try_limit']
+    mha_dict['ssh_try_limit']=int(args['--ssh_try_limit'])
     mha_dict['--template_only']=args['--template_only']
     mha_dict['workdir']=args['--workdir']
     if args['--taskid']:
@@ -129,7 +129,7 @@ def gen_inv(args):
                 i+=1
         for check_ip in ip_list:
             if (not common.check_server(check_ip,22)):
-                logger.info('ssh check limit exceed ({} sec): ip {}'.format(mha_dict['ssh_try_limit'], check_ip))
+                logger.info('ssh check limit exceed ({} sec): ip {}'.format(str(mha_dict['ssh_try_limit']), check_ip))
         logger.info('run ansible from python')
         runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
         runner.run()

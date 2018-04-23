@@ -19,7 +19,7 @@ Options:
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
   --sshpass SSHPASS         Ansible ssh password
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
-  --ssh_try_limit SSHLIMIT  Wait time for ssh reachable [default: 1800]
+  --ssh_try_limit SSHLIMIT  Wait time for ssh reachable [default: 600]
 """
 
 from docopt import docopt
@@ -56,7 +56,7 @@ def gen_inv(args):
     mmm_dict['workdir']=args['--workdir']
     mmm_dict['ssh_pass']=args['--sshpass']
     mmm_dict['ssh_key']=args['--sshkey']
-    mmm_dict['ssh_try_limit']=args['--ssh_try_limit']
+    mmm_dict['ssh_try_limit']=int(args['--ssh_try_limit'])
     if args['--taskid']:
         mmm_dict['task_id']='  external_task_id: {}\n'.format(args['--taskid'])
         mmm_dict['uuid']=args['--taskid']

@@ -1,0 +1,20 @@
+---
+- name: crontab
+  hosts: all
+  gather_facts: False
+{{ task_id }}  tasks:
+    - name: set crontab
+      mycron:
+        name: "MySQL Backup Scheduler"
+        state: absent
+
+    - name: query crontab
+      mycron:
+        name: "MySQL Backup Scheduler"
+        state: query
+      register: crontab
+
+    - name: Record crontab result
+      ara_record:
+        key: "mybak_{{ inventory_hostname }}"
+        value: "{{ crontab }}"
