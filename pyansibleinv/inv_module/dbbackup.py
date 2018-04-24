@@ -132,4 +132,4 @@ def status(args):
 
 def list(args):
     fields = []
-    return json.dumps(dbbackup(args, 'query', fields))
+    return json.dumps(dbbackup(args, 'list', fields))
