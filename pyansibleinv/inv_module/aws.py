@@ -34,10 +34,7 @@ def gen_inv(args):
     ec2_template = 'ec2-instance.j2'
     hosts_script = []
     hosts_script.append('[mysql]')
-    mysql_dict = {}
-    mysql_dict['database']=args['--database']
-    mysql_dict['password']=args['--password']
-    mysql_dict['workdir']=args['--workdir']
+    mysql_dict={k[2:]:v for k, v in args.items()}
     if args['--taskid']:
         mysql_dict['task_id']='  external_task_id: {}\n'.format(args['--taskid'])
         mysql_dict['uuid']=args['--taskid']
@@ -48,9 +45,7 @@ def gen_inv(args):
     logger = common.MyLogger('aws', log_filename).default_logger.logger
     logger.info('args:'+str(args))
     mysql_dict['hostname']='mysql-'+mysql_dict['database'].lower()+'-'+mysql_dict['uuid'][:7]
-    mysql_dict['ssh_pass']=args['--sshpass']
-    mysql_dict['ssh_key']=args['--sshkey']
-    mysql_dict['ssh_try_limit']=args['--ssh_try_limit']
+    mysql_dict['ssh_try_limit']=int(args['--ssh_try_limit'])
     # provision ec2 instance
     terraform_cwd = '/opt/terraform/inventory/aws/us-east-1'
     terraform_filename = os.path.join(terraform_cwd,'ec2-'+mysql_dict['hostname']+'.tf')
@@ -83,10 +78,10 @@ def gen_inv(args):
     playbook_filename=os.path.join(mysql_dict['workdir'],'mysql_'+ mysql_dict['uuid']+'.yml')
     host_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['uuid'],'hosts')
     setting_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['uuid'],'pillar','mysql.yml')
-    if mysql_dict['ssh_pass']:
-        ansible_auth='ansible_ssh_pass={}'.format(mysql_dict['ssh_pass'])
+    if mysql_dict['sshpass']:
+        ansible_auth='ansible_ssh_pass={}'.format(mysql_dict['sshpass'])
     else:
-        ansible_auth='ansible_ssh_private_key_file={}'.format(mysql_dict['ssh_key'])
+        ansible_auth='ansible_ssh_private_key_file={}'.format(mysql_dict['sshkey'])
     hosts_script.append('{:<40}{:<40}{:<50} ansible_ssh_user=centos ansible_become=true ansible_become_user=root ansible_become_method=sudo'.format(mysql_dict['hostname']+'.useast1.aws', 'ansible_ssh_host='+mysql_dict['ip'], ansible_auth))
     logger.info('create ansible hosts: {}'.format(host_filename))
     common.render_template('\n'.join(hosts_script),{},host_filename)

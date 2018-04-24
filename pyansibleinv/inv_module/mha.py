@@ -44,20 +44,12 @@ def gen_inv(args):
     mha_group_script = []
     replication_script = []
     hosts_script.append('[mha]')
-    mha_dict = {}
-    mha_dict['monitor_vip']=args['--monitor_vip']
-    mha_dict['password']=args['--password']
-    mha_dict['cluster_id']=args['--cluster_id']
+    mha_dict={k[2:]:v for k, v in args.items()}
     mha_dict['data_hosts']=args['--data_host'].split(",")
     mha_dict['monitor_hosts']=args['--monitor_host'].split(",")
     if len(mha_dict['monitor_hosts']) == 1:
         mha_dict['monitor_hosts'].append('fakehost.domain:192.168.98.98')
-    mha_dict['db_vip']=args['--db_vip']
-    mha_dict['ssh_pass']=args['--sshpass']
-    mha_dict['ssh_key']=args['--sshkey']
     mha_dict['ssh_try_limit']=int(args['--ssh_try_limit'])
-    mha_dict['--template_only']=args['--template_only']
-    mha_dict['workdir']=args['--workdir']
     if args['--taskid']:
         mha_dict['task_id']='  external_task_id: {}\n'.format(args['--taskid'])
         mha_dict['uuid']=args['--taskid']
@@ -68,10 +60,10 @@ def gen_inv(args):
     mha_dict['parted']='' if args['--without_parted'] else '\n    - parted'
     mha_dict['backup']='' if args['--without_backup'] else '\n    - mysql_backup'
 
-    if mha_dict['ssh_pass']:
-        ansible_auth='ansible_ssh_pass={}'.format(mha_dict['ssh_pass'])
+    if mha_dict['sshpass']:
+        ansible_auth='ansible_ssh_pass={}'.format(mha_dict['sshpass'])
     else:
-        ansible_auth='ansible_ssh_private_key_file={}'.format(mha_dict['ssh_key'])
+        ansible_auth='ansible_ssh_private_key_file={}'.format(mha_dict['sshkey'])
     log_filename=os.path.join(mha_dict['workdir'],'mha_'+ mha_dict['uuid']+'.log')
     logger = common.MyLogger('mha', log_filename).default_logger.logger
     logger.info('args:'+str(args))
@@ -118,7 +110,7 @@ def gen_inv(args):
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,playbook_template))),mha_dict,playbook_filename)
     logger.info('create mysql with mha setting: {}'.format(setting_filename))
     common.render_template('\n'.join(common.read_template(os.path.join(common.template_dir,setting_template))),mha_dict,setting_filename)
-    if mha_dict['--template_only']:
+    if mha_dict['template_only']:
         print('You can run ansible-playbook -i {} {}'.format(host_filename, playbook_filename))
     else:
         logger.info('check ssh availability')

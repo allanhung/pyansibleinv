@@ -39,11 +39,8 @@ def gen_inv(args):
 
     hosts_script = []
     hosts_script.append('[mmm]')
-    mmm_dict = {}
-    mmm_dict['password']=args['--password']
-    mmm_dict['cluster_id']=args['--cluster_id']
+    mmm_dict={k[2:]:v for k, v in args.items()}
     mmm_dict['mon_fqdn']='monitor_vip'
-    mmm_dict['monitor_vip']=args['--monitor_vip']
     mmm_dict['heartbeat']='' if mmm_dict['monitor_vip'] == '192.168.10.1' else '\n    - heartbeat'
     mmm_dict['writer_fqdn']='writer_vip'
     mmm_dict['writer_vips']=args['--writer_vip'].split(",")
@@ -53,9 +50,6 @@ def gen_inv(args):
     if len( mmm_dict['monitor_hosts']) == 1:
          mmm_dict['monitor_hosts'].append('fakehost.domain:192.168.98.98')
     mmm_dict['data_hosts']=args['--data_host'].split(",")
-    mmm_dict['workdir']=args['--workdir']
-    mmm_dict['ssh_pass']=args['--sshpass']
-    mmm_dict['ssh_key']=args['--sshkey']
     mmm_dict['ssh_try_limit']=int(args['--ssh_try_limit'])
     if args['--taskid']:
         mmm_dict['task_id']='  external_task_id: {}\n'.format(args['--taskid'])
@@ -63,10 +57,10 @@ def gen_inv(args):
     else:
         mmm_dict['task_id']=''
         mmm_dict['uuid']=str(uuid.uuid4())
-    if mmm_dict['ssh_pass']:
-        ansible_auth='ansible_ssh_pass={}'.format(mmm_dict['ssh_pass'])
+    if mmm_dict['sshpass']:
+        ansible_auth='ansible_ssh_pass={}'.format(mmm_dict['sshpass'])
     else:
-        ansible_auth='ansible_ssh_private_key_file={}'.format(mmm_dict['ssh_key'])
+        ansible_auth='ansible_ssh_private_key_file={}'.format(mmm_dict['sshkey'])
 
     playbook_filename=os.path.join(mmm_dict['workdir'],'mmm_'+ mmm_dict['uuid']+'.yml')
     host_filename=os.path.join(mmm_dict['workdir'],'inventory',mmm_dict['uuid'],'hosts')

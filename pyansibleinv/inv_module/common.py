@@ -7,8 +7,24 @@ import pyansibleinv
 import logging
 from jinja2 import Template
 from datetime import datetime
+from StringIO import StringIO
+from ara.shell import AraCli
 
 template_dir = '/usr/share/pyansibleinv'
+
+class AraApi(AraCli):
+    def __init__(self):
+        super(AraApi, self).__init__()
+
+    def configure_logging(self):
+        pass
+
+    def run_result(self, cmd):
+        cli_stdout = StringIO()
+        cli_stderr = StringIO()
+        self._set_streams(None, cli_stdout, cli_stderr)
+        self.run(cmd.split(' '))
+        return {'stdout': cli_stdout.getvalue(), 'stderr': cli_stderr.getvalue()}
 
 class MyFormatter(logging.Formatter):
     converter=datetime.fromtimestamp

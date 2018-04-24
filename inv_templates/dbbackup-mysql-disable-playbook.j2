@@ -13,8 +13,9 @@
         name: "MySQL Backup Scheduler"
         state: query
       register: crontab
-
+{% raw %}
     - name: Record crontab result
       ara_record:
         key: "mybak_{{ inventory_hostname }}"
         value: "{{ crontab }}"
+{% endraw %}

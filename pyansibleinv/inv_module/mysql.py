@@ -36,10 +36,7 @@ def gen_inv(args):
     setting_template = 'mysql-setting.j2'
     hosts_script = []
     hosts_script.append('[mysql]')
-    mysql_dict = {}
-    mysql_dict['database']=args['--database']
-    mysql_dict['password']=args['--password']
-    mysql_dict['workdir']=args['--workdir']
+    mysql_dict={k[2:]:v for k, v in args.items()}
     if args['--taskid']:
         mysql_dict['task_id']='  external_task_id: {}\n'.format(args['--taskid'])
         mysql_dict['uuid']=args['--taskid']
@@ -51,17 +48,14 @@ def gen_inv(args):
     logger.info('args:'+str(args))
     mysql_dict['hostname']=args['--hostname'].lower()
     mysql_dict['ip']=args['--ip']
-    mysql_dict['ssh_pass']=args['--sshpass']
-    mysql_dict['ssh_key']=args['--sshkey']
     mysql_dict['ssh_try_limit']=int(args['--ssh_try_limit'])
-    mysql_dict['template_only']=args['--template_only']
     playbook_filename=os.path.join(mysql_dict['workdir'],'mysql_'+ mysql_dict['uuid']+'.yml')
     host_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['uuid'],'hosts')
     setting_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['uuid'],'pillar','mysql.yml')
-    if mysql_dict['ssh_pass']:
-        ansible_auth='ansible_ssh_pass={}'.format(mysql_dict['ssh_pass'])
+    if mysql_dict['sshpass']:
+        ansible_auth='ansible_ssh_pass={}'.format(mysql_dict['sshpass'])
     else:
-        ansible_auth='ansible_ssh_private_key_file={}'.format(mysql_dict['ssh_key'])
+        ansible_auth='ansible_ssh_private_key_file={}'.format(mysql_dict['sshkey'])
     hosts_script.append('{:<60}{:<60}{}'.format(mysql_dict['hostname'], 'ansible_ssh_host='+mysql_dict['ip'], ansible_auth))
 
     logger.info('create ansible hosts: {}'.format(host_filename))

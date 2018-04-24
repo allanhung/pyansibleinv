@@ -6,8 +6,9 @@
     - name: list mysql backup set
       shell: pyxbackup list --api 1
       register: backup_list
-    
+{% raw %}    
     - name: Record backup result
       ara_record:
         key: "mybak_{{ inventory_hostname }}"
         value: "{{ backup_list.stdout }}"
+{% endraw %}
