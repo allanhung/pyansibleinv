@@ -19,7 +19,7 @@ Options:
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
   --sshpass SSHPASS         Ansible ssh password
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
-  --ssh_try_limit SSHLIMIT  Wait time for ssh reachable [default: 600]
+  --ssh_try_limit SSHLIMIT  test count for ssh reachable (socket timeout is 5 sec) [default: 120]
 """
 
 from docopt import docopt

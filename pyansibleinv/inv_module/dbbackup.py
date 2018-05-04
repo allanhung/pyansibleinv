@@ -18,7 +18,7 @@ Options:
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
   --sshpass SSHPASS         Ansible ssh password
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
-  --ssh_try_limit SSHLIMIT  Wait time for ssh reachable [default: 600]
+  --ssh_try_limit SSHLIMIT  test count for ssh reachable (socket timeout is 5 sec) [default: 3]
   --cluster_id CLUSTERID    Cluster id
   --taskid TASKID           Task id for create mysql single instance
   --template_only           Generate template only
@@ -34,6 +34,7 @@ Options:
 from docopt import docopt
 import common
 import os
+import sys
 import time
 from datetime import timedelta
 import uuid
@@ -86,31 +87,43 @@ def dbbackup(args, func_type, fields):
     else:
         logger.info('check ssh availability')
         i=1
+        check_list = []
         for check_ip in ip_list:
             while (not common.check_server(check_ip,22)) and (i < backup_dict['ssh_try_limit']) :
                 time.sleep(1)
                 i+=1
         for check_ip in ip_list:
-            if (not common.check_server(check_ip,22)):
+            check_result = common.check_server(check_ip,22)
+            if (not check_result):
+                check_list.append(check_result)
                 logger.info('ssh check limit exceed ({} sec): ip {}'.format(str(backup_dict['ssh_try_limit']), check_ip))
         logger.info('run ansible from python')
         runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
         runner.run()
         print("--- Total Excution time: %s ---" % str(timedelta(seconds=(time.time() - start_time))))
-        result_dict = {}
+        result_list = []
         araapi = common.AraApi()
-        for host_info in host_list:
+
+        for i, host_info in enumerate(host_list):
             cmd = 'data show --playbook %s mybak_%s -f json' % (backup_dict['uuid'], host_info)
             result = araapi.run_result(cmd)
             if result['stderr']:
                 logger.error('ara cmd error: {}: {}'.format(host_info, result['stderr']))
-            tmp_dict = json.loads(result['stdout'])['Value']
+            if result['stdout']:
+                 tmp_dict = json.loads(result['stdout'])['Value']
+            else:
+                 tmp_dict = {}
             if fields:
                 for k in tmp_dict.keys():
                     if k not in fields:
                         tmp_dict.pop(k)
-            result_dict[host_info] = tmp_dict
-    return result_dict
+            tmp_dict['hostname']=host_info
+            tmp_dict['ssh_check']=check_list[i]
+            result_list.append(tmp_dict)
+    logger.info('return value: %s' % (result_list))
+    sys.stdout = sys.__stdout__
+    sys.stderr = sys.__stderr__
+    return result_list
 
 def enable(args):
     fields = []

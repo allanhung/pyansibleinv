@@ -78,6 +78,7 @@ def check_server(address, port):
     print "Attempting to connect to %s on port %s" % (address, port)
     try:
         s.connect((address, port))
+        s.settimeout(5)
         print "Connected to %s on port %s" % (address, port)
         return True
     except socket.error, e:
