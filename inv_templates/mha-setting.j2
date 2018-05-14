@@ -27,6 +27,7 @@ mysql_stage:
       - common
       - rpm
       - conf
+      - backup
       - limits
       - initdb
       - databases
@@ -46,13 +47,6 @@ mha_stage:
     - ssh
     - conf
 
-mysql_backup_stage:
-  args:
-    type: list
-  default:
-    - conf
-    - cron
-
 parted_stage:
   args:
     type: list
@@ -71,6 +65,7 @@ mysql_backup:
     backup_data_dir: /dbbackup/{{ service_name }}/{{ dbfqdn }}/{{ hostname }}
     retention_sets: 3
     incr_retention_sets: 2
+    enable: {{ enable_backup }}
 
 mysql_app_user:
   default:

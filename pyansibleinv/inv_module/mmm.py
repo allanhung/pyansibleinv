@@ -4,7 +4,7 @@
 generate ansible inventory for mmm
 
 Usage:
-  pyansibleinv mmm [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] --cluster_id CLUSTERID --data_host DATAHOSTS --monitor_host MONHOSTS --writer_vip WVIP --reader_vip RVIP
+  pyansibleinv mmm [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--without_backup] --cluster_id CLUSTERID --data_host DATAHOSTS --monitor_host MONHOSTS --writer_vip WVIP --reader_vip RVIP
 
 Arguments:
   --cluster_id CLUSTERID    MySQL mmm Cluster id
@@ -20,6 +20,7 @@ Options:
   --sshpass SSHPASS         Ansible ssh password
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
   --ssh_try_limit SSHLIMIT  test count for ssh reachable (socket timeout is 5 sec) [default: 120]
+  --without_backup          withount backup
 """
 
 from docopt import docopt
@@ -47,6 +48,7 @@ def gen_inv(args):
     mmm_dict['reader_fqdn']='reader_vip'
     mmm_dict['reader_vips']=args['--reader_vip'].split(",")
     mmm_dict['monitor_hosts']=args['--monitor_host'].split(",")
+    mmm_dict['enable_backup']=not args['--without_backup']
     if len( mmm_dict['monitor_hosts']) == 1:
          mmm_dict['monitor_hosts'].append('fakehost.domain:192.168.98.98')
     mmm_dict['data_hosts']=args['--data_host'].split(",")

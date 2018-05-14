@@ -4,7 +4,7 @@
 generate ansible inventory for mysql single instance
 
 Usage:
-  pyansibleinv mysql [--database DATABASE] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--taskid TASKID] [--template_only] --hostname HOSTNAME --ip IP
+  pyansibleinv mysql [--database DATABASE] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--taskid TASKID] [--template_only] [--without_backup] --hostname HOSTNAME --ip IP
 
 Arguments:
   --hostname HOSTNAME       MySQL single instance hostname
@@ -22,6 +22,7 @@ Options:
   --ssh_try_limit SSHLIMIT  test count for ssh reachable (socket timeout is 5 sec) [default: 120]
   --taskid TASKID           Task id for create mysql single instance
   --template_only           Generate template only
+  --without_backup          withount backup
 """
 
 from docopt import docopt
@@ -51,6 +52,7 @@ def gen_inv(args):
     mysql_dict['hostname']=args['--hostname'].lower()
     mysql_dict['ip']=args['--ip']
     mysql_dict['ssh_try_limit']=int(args['--ssh_try_limit'])
+    mysql_dict['enable_backup']=not args['--without_backup']
     playbook_filename=os.path.join(mysql_dict['workdir'],'mysql_'+ mysql_dict['uuid']+'.yml')
     host_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['uuid'],'hosts')
     setting_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['uuid'],'pillar','mysql.yml')

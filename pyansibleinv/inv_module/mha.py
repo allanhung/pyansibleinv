@@ -61,7 +61,7 @@ def gen_inv(args):
         mha_dict['uuid']=str(uuid.uuid4())
 
     mha_dict['parted']='' if args['--without_parted'] else '\n    - parted'
-    mha_dict['backup']='' if args['--without_backup'] else '\n    - mysql_backup'
+    mha_dict['enable_backup']=not args['--without_backup']
 
     if mha_dict['sshpass']:
         ansible_auth='ansible_ssh_pass={}'.format(mha_dict['sshpass'])
