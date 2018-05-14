@@ -4,10 +4,10 @@
 database backup scheduler setting
 
 Usage:
-  pyansibleinv dbbackup enable [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--minute MINUTE] [--hour HOUR] [--day DAY] [--month MONTH] [--day_of_week DAYOFWEEK] [--rsets RSETS] [--isets ISETS] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
-  pyansibleinv dbbackup disable [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
-  pyansibleinv dbbackup status [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
-  pyansibleinv dbbackup list [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
+  pyansibleinv dbbackup enable [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--minute MINUTE] [--hour HOUR] [--day DAY] [--month MONTH] [--day_of_week DAYOFWEEK] [--rsets RSETS] [--isets ISETS] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
+  pyansibleinv dbbackup disable [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
+  pyansibleinv dbbackup status [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
+  pyansibleinv dbbackup list [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
 
 Arguments:
   --dbtype DBTYPE           Database type (e.q. mysql, mysql_mha, mssql, mssql_alwayson)
@@ -20,6 +20,8 @@ Options:
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
   --ssh_try_limit SSHLIMIT  test count for ssh reachable (socket timeout is 5 sec) [default: 3]
   --cluster_id CLUSTERID    Cluster id
+  --service_name SRVNAME    Service Name
+  --tenant TENANT           Tenant Name
   --taskid TASKID           Task id for create mysql single instance
   --template_only           Generate template only
   --minute MINUTE           Crontab minute [default: 2]
@@ -94,8 +96,8 @@ def dbbackup(args, func_type, fields):
                 i+=1
         for check_ip in ip_list:
             check_result = common.check_server(check_ip,22)
+            check_list.append(check_result)
             if (not check_result):
-                check_list.append(check_result)
                 logger.info('ssh check limit exceed ({} sec): ip {}'.format(str(backup_dict['ssh_try_limit']), check_ip))
         logger.info('run ansible from python')
         runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
@@ -110,7 +112,9 @@ def dbbackup(args, func_type, fields):
             if result['stderr']:
                 logger.error('ara cmd error: {}: {}'.format(host_info, result['stderr']))
             if result['stdout']:
-                 tmp_dict = json.loads(result['stdout'])['Value']
+                tmp_dict = json.loads(result['stdout'])['Value']
+                if isinstance(tmp_dict, list):
+                    tmp_dict = {'list': tmp_dict}
             else:
                  tmp_dict = {}
             if fields:
@@ -143,6 +147,6 @@ def status(args):
     fields.append('job_context')
     return json.dumps(dbbackup(args, 'query', fields))
 
-def list(args):
+def listx(args):
     fields = []
     return json.dumps(dbbackup(args, 'list', fields))

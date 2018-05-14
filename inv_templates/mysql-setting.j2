@@ -50,6 +50,13 @@ mysql_root:
     {{ hostname }}:
       password: '{{ password }}'
 
+mysql_backup:
+  default:
+    backup_root_dir: /dbbackup
+    backup_data_dir: /dbbackup/{{ service_name }}/{{ hostname }}/{{ hostname }}
+    retention_sets: 3
+    incr_retention_sets: 2
+
 mysql_app_user:
   default:
     app:

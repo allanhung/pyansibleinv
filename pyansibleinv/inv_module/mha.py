@@ -4,7 +4,7 @@
 generate ansible inventory for mha
 
 Usage:
-  pyansibleinv mha [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--template_only] [--without_parted] [--without_backup] --cluster_id CLUSTERID --data_host DATAHOSTS --monitor_host MONHOSTS --db_vip DBVIP
+  pyansibleinv mha [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] [--without_parted] [--without_backup] --cluster_id CLUSTERID --data_host DATAHOSTS --monitor_host MONHOSTS --db_vip DBVIP
 
 Arguments:
   --cluster_id CLUSTERID    MySQL mha Cluster id
@@ -20,6 +20,9 @@ Options:
   --sshpass SSHPASS         Ansible ssh password
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
   --ssh_try_limit SSHLIMIT  test count for ssh reachable (socket timeout is 5 sec) [default: 120]
+  --cluster_id CLUSTERID    Cluster id
+  --service_name SRVNAME    Service Name
+  --tenant TENANT           Tenant Name
   --taskid TASKID           Task id for create mysql single instance
   --template_only           Generate template only
   --without_parted          without partition and format disk
