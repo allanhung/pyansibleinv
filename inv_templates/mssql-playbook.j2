@@ -1,0 +1,7 @@
+- name: mssql single instance
+  hosts: all
+{{ task_id }}  pre_tasks:
+    - pillar: {}
+  roles:
+    - win_common
+    - mssql_2017
