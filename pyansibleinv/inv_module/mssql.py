@@ -58,7 +58,7 @@ def gen_inv(args):
     playbook_filename=os.path.join(mssql_dict['workdir'],'mssql_'+ mssql_dict['uuid']+'.yml')
     host_filename=os.path.join(mssql_dict['workdir'],'inventory',mssql_dict['uuid'],'hosts')
     setting_filename=os.path.join(mssql_dict['workdir'],'inventory',mssql_dict['uuid'],'pillar','mssql.yml')
-    hosts_script.append("{:<30} ansible_ssh_host={:<20} ansible_ssh_user='{:<20}' ansible_ssh_pass='{:<20}' ansible_ssh_port={:<5} ansible_become_pass='{:<20}' ansible_winrm_transport=ntlm ansible_connection=winrm ansible_winrm_server_cert_validation=ignore".format(mssql_dict['hostname'], mssql_dict['ip'], mssql_dict['sshuser'], mssql_dict['sshpass'], str(mssql_dict['sshport']), mssql_dict['sshpass']))
+    hosts_script.append("{:<30} ansible_ssh_host={:<20} ansible_ssh_user={:<20} ansible_ssh_pass={:<20} ansible_ssh_port={:<5} ansible_become_pass={:<20} ansible_winrm_transport=ntlm ansible_connection=winrm ansible_winrm_server_cert_validation=ignore".format(mssql_dict['hostname'], mssql_dict['ip'], "'"+mssql_dict['sshuser']+"'", "'"+mssql_dict['sshpass']+"'", str(mssql_dict['sshport']), "'"+mssql_dict['sshpass']+"'"))
 
     logger.info('create ansible hosts: {}'.format(host_filename))
     common.render_template('\n'.join(hosts_script),{},host_filename)
