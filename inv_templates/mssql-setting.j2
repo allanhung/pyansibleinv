@@ -16,43 +16,8 @@ mssql_stage:
     - database
     - users
 
-mssql_common:
-  default:
-    dba_folder: "D:\\dba"
-    software_folder: "D:\\software"
-    bak_folder: "SQLBCK"
-    iso_2017: sqlserver_2017.iso
-
-mssql_kb:
-  default:
-    2017:
-      - Windows8.1-KB2919442-x64.msu
-      - Windows8.1-KB2919355-x64.msu
-
-mssql_unattended:
-  default:
-    2017: SQL2017_SilentInstall_StandAlone.ini
-
-mssql_productid:
-  default:
-    2017: Microsoft SQL Server SQL2017
-
-mssql_patch:
-  default:
-    2017:
-      - SQLServer2017-KB4052987-x64.exe
-
-mssql_client:
-  default:
-    2017:
-      client_package: Server2017-KB4052987-x64.exe
-      product_id: '{DED314CA-0EFE-4593-9D66-EF75E5289A4C}'
-
 mssql_password:
   default:
-    default_svc_password: 'password'
-    default_agent_password: 'password'
-    default_sa_password: 'password'
     svc_password: 'password'
     oper_password: 'password'
     agent_password: 'password'
@@ -82,3 +47,4 @@ mssql_user:
   default:
     - username: {{ dbuser }}
       password: {{ password }}
+      dbrole: sysadmin
