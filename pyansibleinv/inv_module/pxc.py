@@ -4,10 +4,9 @@
 generate ansible inventory for pxc
 
 Usage:
-  pyansibleinv pxc [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] [--without_parted] [--without_backup] [--monitor_host MONHOSTS] --cluster_id CLUSTERID --data_host DATAHOSTS --db_vip DBVIP
+  pyansibleinv pxc [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] [--without_parted] [--without_backup] [--monitor_host MONHOSTS] --data_host DATAHOSTS --db_vip DBVIP
 
 Arguments:
-  --cluster_id CLUSTERID    MySQL pxc Cluster id
   --data_host DATAHOSTS     MySQL Hosts for pxc (e.q. hostname1:ip1,hostname2:ip2 ...)
   --monitor_host MONHOSTS   Monitor Hosts for pxc (e.q. hostname1:ip1,hostname2:ip2 ...)
   --db_vip WVIP             DB vip for pxc (e.q. 192.168.10.2)
@@ -98,8 +97,6 @@ def gen_inv(args):
             pxc_group_script.append('        bootstrap: True')
         else:
             pxc_group_script.append('        bootstrap: False')
-        pxc_group_script.append('        pxc_args:')
-        pxc_group_script.append('          - candidate_master: "1"')
 
     pxc_dict['pxc_group']='\n'.join(pxc_group_script)
     logger.info('create ansible hosts: {}'.format(host_filename))

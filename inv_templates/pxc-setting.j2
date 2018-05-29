@@ -91,17 +91,3 @@ pxc_group:
   default:
     pxcluster:
 {{ pxc_group }}
-{%- for dhost in data_hostlist %}
-      - hostname: {{ dhost }}
-        role: data
-{%- if loop.index == 0 %}
-        bootstrap: True
-{%- else %}
-        bootstrap: False
-{%- endif %}
-{%- endfor %}
-{%- for mhost in mon_hostlist %}
-      - hostname: {{ mhost }}
-        role: arbitrator
-        bootstrap: False
-{%- endfor %}

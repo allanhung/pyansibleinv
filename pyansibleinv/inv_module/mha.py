@@ -4,10 +4,9 @@
 generate ansible inventory for mha
 
 Usage:
-  pyansibleinv mha [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] [--without_parted] [--without_backup] --cluster_id CLUSTERID --data_host DATAHOSTS --monitor_host MONHOSTS --db_vip DBVIP
+  pyansibleinv mha [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] [--without_parted] [--without_backup] --data_host DATAHOSTS --monitor_host MONHOSTS --db_vip DBVIP
 
 Arguments:
-  --cluster_id CLUSTERID    MySQL mha Cluster id
   --data_host DATAHOSTS     MySQL Hosts for mha (e.q. hostname1:ip1,hostname2:ip2 ...)
   --monitor_host MONHOSTS   Monitor Hosts for mha (e.q. hostname1:ip1,hostname2:ip2 ...)
   --db_vip WVIP             DB vip for mha (e.q. 192.168.10.2)
