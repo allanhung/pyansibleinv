@@ -1,0 +1,8 @@
+- name: pxc installation
+  hosts: all
+{{ task_id }}  pre_tasks:
+    - pillar: {}
+  roles:
+    - common
+    - parted
+    - mysql
