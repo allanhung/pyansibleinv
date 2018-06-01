@@ -71,10 +71,10 @@ def gen_inv(args):
     else:
         logger.info('check ssh availability')
         i=1
-        while (not common.check_server(mssql_dict['ip'],22)) and (i < mssql_dict['ssh_try_limit']) :
+        while (not common.check_server(mssql_dict['ip'],int(mssql_dict['sshport']))) and (i < mssql_dict['ssh_try_limit']) :
             time.sleep(1)
             i+=1
-        if (not common.check_server(mssql_dict['ip'],22)):
+        if (not common.check_server(mssql_dict['ip'],int(mssql_dict['sshport']))):
             logger.info('ssh check limit exceed ({} sec): ip {}'.format(str(mssql_dict['ssh_try_limit']), mssql_dict['ip']))
         logger.info('run ansible from python')
         runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)

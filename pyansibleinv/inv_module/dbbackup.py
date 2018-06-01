@@ -78,7 +78,7 @@ def dbbackup(args, func_type, fields):
         k=k.lower()
         host_list.append(k)
         ip_list.append(v)
-        hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{}'.format(k, 'ansible_ssh_host='+v, str(backup_dict['sshport'], ansible_auth))
+        hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{}'.format(k, 'ansible_ssh_host='+v, str(backup_dict['sshport']), ansible_auth))
 
     logger.info('create ansible hosts: {}'.format(host_filename))
     common.render_template('\n'.join(hosts_script),{},host_filename)
