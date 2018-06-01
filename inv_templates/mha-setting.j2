@@ -75,6 +75,11 @@ mysql_app_user:
         password: '{{ password }}'
         priv: '*.*:ALL,GRANT'
         state: present
+      - name: root
+        host: '172.%'
+        password: '{{ password }}'
+        priv: '*.*:ALL,GRANT'
+        state: present
 
 mysql_database:
   args:

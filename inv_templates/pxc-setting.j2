@@ -28,9 +28,11 @@ mysql_stage:
     - users_app
     - users_base
     - users_dba
+    - users_pxc
     - users_vtr
-    - pxc_bootstrap
     - import
+    - pxc_bootstrap
+    - pxc_mysqlcheck
 
 parted_stage:
   args:
@@ -46,6 +48,14 @@ mysql_root:
 
 mysql_backup:
   hostname:
+{%- for mhost in mon_hostlist %}
+    {{ mhost }}:
+        backup_root_dir: /dbbackup
+        backup_data_dir: /dbbackup/{{ service_name }}/{{ mhost }}/{{ mhost }}
+        retention_sets: 3
+        incr_retention_sets: 2
+        enable: False
+{%- endfor %}
 {%- for dhost in data_hostlist %}
     {{ dhost }}:
         backup_root_dir: /dbbackup
@@ -60,6 +70,11 @@ mysql_app_user:
     app:
       - name: root
         host: '10.%'
+        password: '{{ password }}'
+        priv: '*.*:ALL,GRANT'
+        state: present
+      - name: root
+        host: '172.%'
         password: '{{ password }}'
         priv: '*.*:ALL,GRANT'
         state: present
