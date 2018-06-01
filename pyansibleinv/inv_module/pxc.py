@@ -4,7 +4,7 @@
 generate ansible inventory for pxc
 
 Usage:
-  pyansibleinv pxc [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--hostarg HOSTARG] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] [--without_parted] [--without_backup] [--monitor_host MONHOSTS] --data_host DATAHOSTS --db_vip DBVIP
+  pyansibleinv pxc [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--hostarg HOSTARG] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] [--without_parted] [--without_backup] [--monitor_host MONHOSTS] --data_host DATAHOSTS --db_vip DBVIP
 
 Arguments:
   --data_host DATAHOSTS     MySQL Hosts for pxc (e.q. hostname1:ip1,hostname2:ip2 ...)
@@ -17,6 +17,7 @@ Options:
   --password PASSWORD       database password [default: password]
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
   --sshpass SSHPASS         Ansible ssh password
+  --sshport SSHPORT         Ansible ssh port [default: 22]
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
   --hostarg HOSTARG         Ansible hosts additional arguments
   --ssh_try_limit SSHLIMIT  test count for ssh reachable (socket timeout is 5 sec) [default: 120]
@@ -81,7 +82,7 @@ def gen_inv(args):
         k=k.lower()
         pxc_dict['mon_hostlist'].append(k)
         ip_list.append(v)
-        hosts_script.append('{:<60}{:<60}{} {}'.format(k, 'ansible_ssh_host='+v, ansible_auth, pxc_dict['hostarg']))
+        hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{} {}'.format(k, 'ansible_ssh_host='+v, str(pxc_dict['sshport']), ansible_auth, pxc_dict['hostarg']))
         pxc_group_script.append('      - hostname: {}'.format(k))
         pxc_group_script.append('        role: arbitrator')
         pxc_group_script.append('        bootstrap: False')
@@ -90,7 +91,7 @@ def gen_inv(args):
         (k, v) = host_info.split(":")
         k=k.lower()
         pxc_dict['data_hostlist'].append(k)
-        hosts_script.append('{:<60}{:<60}{} {}'.format(k, 'ansible_ssh_host='+v, ansible_auth, pxc_dict['hostarg']))
+        hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{} {}'.format(k, 'ansible_ssh_host='+v, str(pxc_dict['sshport']), ansible_auth, pxc_dict['hostarg']))
         ip_list.append(v)
         pxc_group_script.append('      - hostname: {}'.format(k))
         pxc_group_script.append('        role: data')
@@ -112,11 +113,11 @@ def gen_inv(args):
         logger.info('check ssh availability')
         i=1
         for check_ip in ip_list:
-            while (not common.check_server(check_ip,22)) and (i < pxc_dict['ssh_try_limit']) :
+            while (not common.check_server(check_ip,int(pxc_dict['sshport']))) and (i < pxc_dict['ssh_try_limit']) :
                 time.sleep(1)
                 i+=1
         for check_ip in ip_list:
-            if (not common.check_server(check_ip,22)):
+            if (not common.check_server(check_ip,int(pxc_dict['sshport']))):
                 logger.info('ssh check limit exceed ({} sec): ip {}'.format(str(pxc_dict['ssh_try_limit']), check_ip))
         logger.info('run ansible from python')
         runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)

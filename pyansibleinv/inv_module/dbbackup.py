@@ -4,10 +4,10 @@
 database backup scheduler setting
 
 Usage:
-  pyansibleinv dbbackup enable [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--minute MINUTE] [--hour HOUR] [--day DAY] [--month MONTH] [--day_of_week DAYOFWEEK] [--rsets RSETS] [--isets ISETS] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
-  pyansibleinv dbbackup disable [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
-  pyansibleinv dbbackup status [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
-  pyansibleinv dbbackup listx [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
+  pyansibleinv dbbackup enable [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--minute MINUTE] [--hour HOUR] [--day DAY] [--month MONTH] [--day_of_week DAYOFWEEK] [--rsets RSETS] [--isets ISETS] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
+  pyansibleinv dbbackup disable [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
+  pyansibleinv dbbackup status [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
+  pyansibleinv dbbackup listx [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
 
 Arguments:
   --dbtype DBTYPE           Database type (e.q. mysql, mysql_mha, mssql, mssql_alwayson)
@@ -17,6 +17,7 @@ Options:
   -h --help                 Show this screen.
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
   --sshpass SSHPASS         Ansible ssh password
+  --sshport SSHPORT         Ansible ssh port [default: 22]
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
   --ssh_try_limit SSHLIMIT  test count for ssh reachable (socket timeout is 5 sec) [default: 3]
   --cluster_id CLUSTERID    Cluster id
@@ -77,7 +78,7 @@ def dbbackup(args, func_type, fields):
         k=k.lower()
         host_list.append(k)
         ip_list.append(v)
-        hosts_script.append('{:<60}{:<60}{}'.format(k, 'ansible_ssh_host='+v, ansible_auth))
+        hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{}'.format(k, 'ansible_ssh_host='+v, str(backup_dict['sshport'], ansible_auth))
 
     logger.info('create ansible hosts: {}'.format(host_filename))
     common.render_template('\n'.join(hosts_script),{},host_filename)
@@ -91,11 +92,11 @@ def dbbackup(args, func_type, fields):
         i=1
         check_list = []
         for check_ip in ip_list:
-            while (not common.check_server(check_ip,22)) and (i < backup_dict['ssh_try_limit']) :
+            while (not common.check_server(check_ip,int(backup_dict['sshport']))) and (i < backup_dict['ssh_try_limit']) :
                 time.sleep(1)
                 i+=1
         for check_ip in ip_list:
-            check_result = common.check_server(check_ip,22)
+            check_result = common.check_server(check_ip,int(backup_dict['sshport']))
             check_list.append(check_result)
             if (not check_result):
                 logger.info('ssh check limit exceed ({} sec): ip {}'.format(str(backup_dict['ssh_try_limit']), check_ip))

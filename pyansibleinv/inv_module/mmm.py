@@ -4,7 +4,7 @@
 generate ansible inventory for mmm
 
 Usage:
-  pyansibleinv mmm [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--without_backup] --cluster_id CLUSTERID --data_host DATAHOSTS --monitor_host MONHOSTS --writer_vip WVIP --reader_vip RVIP
+  pyansibleinv mmm [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--without_backup] --cluster_id CLUSTERID --data_host DATAHOSTS --monitor_host MONHOSTS --writer_vip WVIP --reader_vip RVIP
 
 Arguments:
   --cluster_id CLUSTERID    MySQL mmm Cluster id
@@ -18,6 +18,7 @@ Options:
   --password PASSWORD       Host password [default: password]
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
   --sshpass SSHPASS         Ansible ssh password
+  --sshport SSHPORT         Ansible ssh port [default: 22]
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
   --ssh_try_limit SSHLIMIT  test count for ssh reachable (socket timeout is 5 sec) [default: 120]
   --without_backup          withount backup
@@ -74,14 +75,14 @@ def gen_inv(args):
         (k, v) = host_info.split(":")
         k=k.lower()
         mmm_dict['mmm_hostlist'].append(k)
-        hosts_script.append('{:<60}{:<60}{}'.format(k, 'ansible_ssh_host='+v, ansible_auth))
+        hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{}'.format(k, 'ansible_ssh_host='+v, str(mmm_dict['sshpass']), ansible_auth))
         mmm_dict['mon_host'+str(i+1)]=k
 
     for i, host_info in enumerate(mmm_dict['data_hosts']):
         (k, v) = host_info.split(":")
         k=k.lower()
         mmm_dict['data_hostlist'].append(k)
-        hosts_script.append('{:<60}{:<60}{}'.format(k, 'ansible_ssh_host='+v, ansible_auth))
+        hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{}'.format(k, 'ansible_ssh_host='+v, str(mmm_dict['sshpass']), ansible_auth))
         mmm_dict['data_host'+str(i+1)]=k
 
     logger.info('create ansible hosts: {}'.format(host_filename))
