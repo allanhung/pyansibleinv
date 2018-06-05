@@ -4,15 +4,15 @@
 generate ansible inventory for pxc
 
 Usage:
-  pyansibleinv pxc [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--hostarg HOSTARG] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] [--without_parted] [--without_backup] [--monitor_host MONHOSTS] --data_host DATAHOSTS --db_vip DBVIP
+  pyansibleinv pxc [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--hostarg HOSTARG] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] [--without_parted] [--without_backup] [--monitor_host MONHOSTS] [--db_vip DBVIP] --data_host DATAHOSTS
 
 Arguments:
   --data_host DATAHOSTS     MySQL Hosts for pxc (e.q. hostname1:ip1,hostname2:ip2 ...)
-  --monitor_host MONHOSTS   Monitor Hosts for pxc (e.q. hostname1:ip1,hostname2:ip2 ...)
-  --db_vip WVIP             DB vip for pxc (e.q. 192.168.10.2)
 Options:
   -h --help                 Show this screen.
   --monitor_vip MONVIP      Monitor vip for pxc (e.q. 192.168.10.1) [default: 192.168.10.1]
+  --monitor_host MONHOSTS   Monitor Hosts for pxc (e.q. hostname1:ip1,hostname2:ip2 ...)
+  --db_vip WVIP             DB vip for pxc (e.q. 192.168.10.2)
   --database DATABASE       Database name create for mysql [default: db1]
   --password PASSWORD       database password [default: password]
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
@@ -76,6 +76,7 @@ def gen_inv(args):
     setting_filename=os.path.join(pxc_dict['workdir'],'inventory',pxc_dict['uuid'],'pillar','pxc.yml')
 
     pxc_dict['data_hostlist']=[]
+    pxc_dict['data_iplist']=[]
     pxc_dict['mon_hostlist']=[]
     for i, host_info in enumerate(pxc_dict['monitor_hosts']):
         (k, v) = host_info.split(":")
@@ -86,11 +87,14 @@ def gen_inv(args):
         pxc_group_script.append('      - hostname: {}'.format(k))
         pxc_group_script.append('        role: arbitrator')
         pxc_group_script.append('        bootstrap: False')
+        if pxc_dict['db_vip']:
+            pxc_group_script.append('        vip: {}'.format(pxc_dict['db_vip']))
 
     for i, host_info in enumerate(pxc_dict['data_hosts']):
         (k, v) = host_info.split(":")
         k=k.lower()
         pxc_dict['data_hostlist'].append(k)
+        pxc_dict['data_iplist'].append(v)
         hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{} {}'.format(k, 'ansible_ssh_host='+v, str(pxc_dict['sshport']), ansible_auth, pxc_dict['hostarg']))
         ip_list.append(v)
         pxc_group_script.append('      - hostname: {}'.format(k))
@@ -100,6 +104,8 @@ def gen_inv(args):
         else:
             pxc_group_script.append('        bootstrap: False')
 
+    if pxc_dict['db_vip']:
+        pxc_dict['ha_setting']="\n    - pacemaker\n    - lvs"
     pxc_dict['pxc_group']='\n'.join(pxc_group_script)
     logger.info('create ansible hosts: {}'.format(host_filename))
     common.render_template('\n'.join(hosts_script),{},host_filename)

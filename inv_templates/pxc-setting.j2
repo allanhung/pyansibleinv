@@ -14,6 +14,21 @@ common_stage:
     - postfix
     - rsyslog
 
+lvs_stage:
+  args:
+    type: list
+  hostname:
+{%- for mhost in mon_hostlist %}
+    {{ mhost }}:
+      - rpm
+      - server
+      - conf
+{%- endfor %}
+{%- for dhost in data_hostlist %}
+    {{ dhost }}:
+      - client
+{%- endfor %}
+
 mysql_stage:
   args:
     type: list
@@ -33,6 +48,17 @@ mysql_stage:
     - import
     - pxc_bootstrap
     - pxc_mysqlcheck
+
+pacemaker_stage:
+  args:
+    type: list
+  hostname:
+{%- for mhost in mon_hostlist %}
+    {{ mhost }}:
+      - rpm
+      - user
+      - conf
+{%- endfor %}
 
 parted_stage:
   args:
@@ -106,3 +132,42 @@ pxc_group:
   default:
     pxcluster:
 {{ pxc_group }}
+
+pacemaker_group:
+  default:
+    pxccluster:
+      property:
+        stonith-enabled: "false"
+        no-quorum-policy: "ignore"
+      resource:
+        - id: db_vip
+          type: "IPaddr2"
+          options:
+            ip: {{ dbvip }}
+            cidr_netmask: 24
+            nic: eth0
+          op:
+            - action: monitor
+              options:
+                interval: 5s
+        - id: garb_srv
+          type: "systemd:garb"
+          op:
+            - action: monitor
+              options:
+                interval: 5s
+
+lvs_group:
+  default:
+    pxcluster:
+      vip: {{ dbvip }}
+      listen_port: 3306
+      nodes:
+{%- for dhost in data_hostlist %}
+        - {{ dhost }}
+{%- endfor %}
+      protocol: tcp
+      checktype: external
+      checkcommand: "/usr/bin/check_pxc.py"
+      checkport: 9200
+      scheduler: wrr
