@@ -22,11 +22,12 @@ lvs_stage:
     {{ mhost }}:
       - rpm
       - server
-      - conf
+      - pxc_conf
 {%- endfor %}
 {%- for dhost in data_hostlist %}
     {{ dhost }}:
       - client
+      - pxc_vip
 {%- endfor %}
 
 mysql_stage:
@@ -56,7 +57,7 @@ pacemaker_stage:
 {%- for mhost in mon_hostlist %}
     {{ mhost }}:
       - rpm
-      - user
+      - users
       - conf
 {%- endfor %}
 
@@ -136,14 +137,20 @@ pxc_group:
 pacemaker_group:
   default:
     pxccluster:
+      nodes:
+{%- for mhost in mon_hostlist %}
+        - {{ mhost }}:
+{%- endfor %}
       property:
         stonith-enabled: "false"
         no-quorum-policy: "ignore"
       resource:
         - id: db_vip
           type: "IPaddr2"
+          group:
+            name: pxc
           options:
-            ip: {{ dbvip }}
+            ip: {{ db_vip }}
             cidr_netmask: 24
             nic: eth0
           op:
@@ -152,6 +159,8 @@ pacemaker_group:
                 interval: 5s
         - id: garb_srv
           type: "systemd:garb"
+          group:
+            name: pxc
           op:
             - action: monitor
               options:
@@ -160,7 +169,7 @@ pacemaker_group:
 lvs_group:
   default:
     pxcluster:
-      vip: {{ dbvip }}
+      vip: {{ db_vip }}
       listen_port: 3306
       nodes:
 {%- for dhost in data_hostlist %}

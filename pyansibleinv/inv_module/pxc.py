@@ -68,6 +68,8 @@ def gen_inv(args):
         ansible_auth='ansible_ssh_pass={}'.format(pxc_dict['sshpass'])
     else:
         ansible_auth='ansible_ssh_private_key_file={}'.format(pxc_dict['sshkey'])
+    if pxc_dict['hostarg']:
+        pxc_dict['hostarg'] = ''
     log_filename=os.path.join(pxc_dict['workdir'],'pxc_'+ pxc_dict['uuid']+'.log')
     logger = common.MyLogger('pxc', log_filename).default_logger.logger
     logger.info('args:'+str(args))
