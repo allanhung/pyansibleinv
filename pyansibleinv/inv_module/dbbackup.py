@@ -104,7 +104,7 @@ def dbbackup(args, func_type, fields):
         runner = pyansible.playbooks.Runner(hosts_file=host_filename, playbook_file=playbook_filename, verbosity=3)
         runner.run()
         print("--- Total Excution time: %s ---" % str(timedelta(seconds=(time.time() - start_time))))
-        result_list = []
+        result_dict = {}
         araapi = common.AraApi()
 
         for i, host_info in enumerate(host_list):
@@ -115,20 +115,19 @@ def dbbackup(args, func_type, fields):
             if result['stdout']:
                 tmp_dict = json.loads(result['stdout'])['Value']
                 if isinstance(tmp_dict, list):
-                    tmp_dict = {'list': tmp_dict}
+                    tmp_dict = {'backup_list': tmp_dict}
             else:
                  tmp_dict = {}
             if fields:
                 for k in tmp_dict.keys():
                     if k not in fields:
                         tmp_dict.pop(k)
-            tmp_dict['hostname']=host_info
             tmp_dict['ssh_check']=check_list[i]
-            result_list.append(tmp_dict)
-    logger.info('return value: %s' % (result_list))
+            result_dict[host_info]=tmp_dict
+    logger.info('return value: %s' % (result_dict))
     sys.stdout = sys.__stdout__
     sys.stderr = sys.__stderr__
-    return result_list
+    return result_dict
 
 def enable(args):
     fields = []
