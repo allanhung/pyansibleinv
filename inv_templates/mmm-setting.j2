@@ -65,7 +65,7 @@ parted_stage:
 mysql_backup:
   default:
     backup_root_dir: /dbbackup
-    backup_data_dir: /dbbackup/{{ service_name }}/{{ dbfqdn }}/{{ hostname }}
+    backup_data_dir: /dbbackup
     retention_sets: 3
     incr_retention_sets: 2
     enable: {{ enable_backup }}

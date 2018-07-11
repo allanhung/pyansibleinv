@@ -75,14 +75,14 @@ def gen_inv(args):
         (k, v) = host_info.split(":")
         k=k.lower()
         mmm_dict['mmm_hostlist'].append(k)
-        hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{}'.format(k, 'ansible_ssh_host='+v, str(mmm_dict['sshpass']), ansible_auth))
+        hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{}'.format(k, 'ansible_ssh_host='+v, str(mmm_dict['sshport']), ansible_auth))
         mmm_dict['mon_host'+str(i+1)]=k
 
     for i, host_info in enumerate(mmm_dict['data_hosts']):
         (k, v) = host_info.split(":")
         k=k.lower()
         mmm_dict['data_hostlist'].append(k)
-        hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{}'.format(k, 'ansible_ssh_host='+v, str(mmm_dict['sshpass']), ansible_auth))
+        hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{}'.format(k, 'ansible_ssh_host='+v, str(mmm_dict['sshport']), ansible_auth))
         mmm_dict['data_host'+str(i+1)]=k
 
     logger.info('create ansible hosts: {}'.format(host_filename))
