@@ -124,7 +124,7 @@ pacemaker_group:
     mmmcluster:
       nodes:
 {%- for mhost in mmm_hostlist %}
-        - {{ mhost }}:
+        - {{ mhost }}
 {%- endfor %}
       property:
         stonith-enabled: "false"

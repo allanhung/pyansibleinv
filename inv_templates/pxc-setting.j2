@@ -139,7 +139,7 @@ pacemaker_group:
     pxccluster:
       nodes:
 {%- for mhost in mon_hostlist %}
-        - {{ mhost }}:
+        - {{ mhost }}
 {%- endfor %}
       property:
         stonith-enabled: "false"

@@ -44,7 +44,7 @@ def gen_inv(args):
     hosts_script.append('[mmm]')
     mmm_dict={k[2:]:v for k, v in args.items()}
     mmm_dict['mon_fqdn']='monitor_vip'
-    if int(['osver']) > 6:
+    if int(mmm_dict['osver']) > 6:
         mmm_dict['heartbeat']=''
         mmm_dict['pacemaker']='' if mmm_dict['monitor_vip'] == '192.168.10.1' else '\n    - pacemaker'
     else:
