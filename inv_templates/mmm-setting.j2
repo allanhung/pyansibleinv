@@ -5,6 +5,7 @@ common_stage:
     - proxy
     - repo
     - rpm
+    - ifcfg
     - sysctl
     - limits
     - snmpd
@@ -13,12 +14,19 @@ common_stage:
     - rsyslog
 
 heartbeat_stage:
-  args:
-    type: list
   hostname:
 {%- for mhost in mmm_hostlist %}
     {{ mhost }}:
       - rpm
+      - conf
+{%- endfor %}
+
+pacemaker_stage:
+  hostname:
+{%- for mhost in mmm_hostlist %}
+    {{ mhost }}:
+      - rpm
+      - users
       - conf
 {%- endfor %}
 
@@ -110,3 +118,35 @@ mysql_replication:
       master_host: {{ data_host2 }}
     {{ data_host2 }}:
       master_host: {{ data_host1 }}
+
+pacemaker_group:
+  default:
+    mmmcluster:
+      nodes:
+{%- for mhost in mmm_hostlist %}
+        - {{ mhost }}:
+{%- endfor %}
+      property:
+        stonith-enabled: "false"
+        no-quorum-policy: "ignore"
+      resource:
+        - id: db_vip
+          type: "IPaddr2"
+          group:
+            name: mmm
+          options:
+            ip: {{ mon_vip }}
+            cidr_netmask: 24
+            nic: eth0
+          op:
+            - action: monitor
+              options:
+                interval: 5s
+        - id: mmm_monitor_srv
+          type: "systemd:mysql-mmm-monitor"
+          group:
+            name: mmm
+          op:
+            - action: monitor
+              options:
+                interval: 5s

@@ -4,7 +4,7 @@
 generate ansible inventory for mmm
 
 Usage:
-  pyansibleinv mmm [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--without_backup] --cluster_id CLUSTERID --data_host DATAHOSTS --monitor_host MONHOSTS --writer_vip WVIP --reader_vip RVIP
+  pyansibleinv mmm [--osver OSVER] [--monitor_vip MONVIP] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID] [--without_backup] --cluster_id CLUSTERID --data_host DATAHOSTS --monitor_host MONHOSTS --writer_vip WVIP --reader_vip RVIP
 
 Arguments:
   --cluster_id CLUSTERID    MySQL mmm Cluster id
@@ -14,6 +14,7 @@ Arguments:
   --reader_vip RVIP         Reader vip for mmm (e.q. ip1,ip2 ...)
 Options:
   -h --help                 Show this screen.
+  --osver OSVER             OS Version [default: 7]
   --monitor_vip MONVIP      Monitor vip for mmm (e.q. ip) [default: 192.168.10.1]
   --password PASSWORD       Host password [default: password]
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
@@ -43,7 +44,12 @@ def gen_inv(args):
     hosts_script.append('[mmm]')
     mmm_dict={k[2:]:v for k, v in args.items()}
     mmm_dict['mon_fqdn']='monitor_vip'
-    mmm_dict['heartbeat']='' if mmm_dict['monitor_vip'] == '192.168.10.1' else '\n    - heartbeat'
+    if int(['osver']) > 6:
+        mmm_dict['heartbeat']=''
+        mmm_dict['pacemaker']='' if mmm_dict['monitor_vip'] == '192.168.10.1' else '\n    - pacemaker'
+    else:
+        mmm_dict['pacemaker']=''
+        mmm_dict['heartbeat']='' if mmm_dict['monitor_vip'] == '192.168.10.1' else '\n    - heartbeat'
     mmm_dict['writer_fqdn']='writer_vip'
     mmm_dict['writer_vips']=args['--writer_vip'].split(",")
     mmm_dict['reader_fqdn']='reader_vip'
