@@ -19,7 +19,6 @@ Options:
   --sshpass SSHPASS         Ansible ssh password
   --sshport SSHPORT         Ansible ssh port [default: 22]
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
-  --hostarg HOSTARG         Ansible hosts additional arguments
   --ssh_try_limit SSHLIMIT  test count for ssh reachable (socket timeout is 5 sec) [default: 3]
   --cluster_id CLUSTERID    Cluster id
   --service_name SRVNAME    Service Name
@@ -33,6 +32,7 @@ Options:
   --day_of_week DAYOFWEEK   Crontab day of week [default: *]
   --rsets RSETS             Backup retension sets [default: 3]
   --isets ISETS             Increamental backup in backup retension sets [default: 2]
+  --hostarg HOSTARG         Ansible hosts additional arguments [default: ]
 """
 
 from docopt import docopt
