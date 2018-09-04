@@ -13,10 +13,10 @@ Options:
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
   --sshpass SSHPASS         Ansible ssh password
   --sshport SSHPORT         Ansible ssh port [default: 22]
-  --hostarg HOSTARG         Ansible hosts additional arguments
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
   --ssh_try_limit SSHLIMIT  Wait time for ssh reachable [default: 1800]
   --taskid TASKID           Task id for create mysql single instance
+  --hostarg HOSTARG         Ansible hosts additional arguments [default: ]
 """
 
 from docopt import docopt

@@ -21,11 +21,11 @@ Options:
   --sshuser SSHUSER         Ansible winrm username
   --sshpass SSHPASS         Ansible winrm password
   --sshport SSHPORT         Winrm listen port
-  --hostarg HOSTARG         Ansible hosts additional arguments
   --ssh_try_limit SSHLIMIT  test count for ssh reachable (socket timeout is 5 sec) [default: 120]
   --taskid TASKID           Task id for create mssql single instance
   --template_only           Generate template only
   --without_backup          withount backup
+  --hostarg HOSTARG         Ansible hosts additional arguments [default: ]
 """
 
 from docopt import docopt

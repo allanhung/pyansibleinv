@@ -19,7 +19,6 @@ Options:
   --sshpass SSHPASS         Ansible ssh password
   --sshport SSHPORT         Ansible ssh port [default: 22]
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
-  --hostarg HOSTARG         Ansible hosts additional arguments
   --ssh_try_limit SSHLIMIT  test count for ssh reachable (socket timeout is 5 sec) [default: 120]
   --cluster_id CLUSTERID    Cluster id
   --service_name SRVNAME    Service Name
@@ -28,6 +27,7 @@ Options:
   --template_only           Generate template only
   --without_parted          without partition and format disk
   --without_backup          withount backup
+  --hostarg HOSTARG         Ansible hosts additional arguments [default: ]
 """
 
 from docopt import docopt

@@ -20,11 +20,11 @@ Options:
   --sshpass SSHPASS         Ansible ssh password
   --sshport SSHPORT         Ansible ssh port [default: 22]
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
-  --hostarg HOSTARG         Ansible hosts additional arguments
   --ssh_try_limit SSHLIMIT  test count for ssh reachable (socket timeout is 5 sec) [default: 120]
   --taskid TASKID           Task id for create mysql single instance
   --template_only           Generate template only
   --without_backup          withount backup
+  --hostarg HOSTARG         Ansible hosts additional arguments [default: ]
 """
 
 from docopt import docopt
