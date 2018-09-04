@@ -67,6 +67,7 @@ def dbbackup(args, func_type, fields):
     playbook_filename=os.path.join(backup_dict['workdir'],'dbbackup_%s_%s_%s.yml' % (backup_dict['dbtype'], func_type, backup_dict['uuid']))
 
     host_filename=os.path.join(backup_dict['workdir'],'inventory',backup_dict['uuid'],'hosts')
+    ansible_auth=''
     if backup_dict['sshpass']:
         ansible_auth='ansible_ssh_pass={}'.format(backup_dict['sshpass'])
     elif backup_dict['sshkey']:

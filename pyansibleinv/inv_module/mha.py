@@ -64,6 +64,7 @@ def gen_inv(args):
     mha_dict['parted']='' if args['--without_parted'] else '\n    - parted'
     mha_dict['enable_backup']=not args['--without_backup']
 
+    ansible_auth=''
     if mha_dict['sshpass']:
         ansible_auth='ansible_ssh_pass={}'.format(mha_dict['sshpass'])
     elif mha_dict['sshkey']:

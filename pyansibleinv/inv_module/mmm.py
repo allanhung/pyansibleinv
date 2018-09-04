@@ -67,6 +67,7 @@ def gen_inv(args):
     else:
         mmm_dict['task_id']=''
         mmm_dict['uuid']=str(uuid.uuid4())
+    ansible_auth=''
     if mmm_dict['sshpass']:
         ansible_auth='ansible_ssh_pass={}'.format(mmm_dict['sshpass'])
     elif mmm_dict['sshkey']:

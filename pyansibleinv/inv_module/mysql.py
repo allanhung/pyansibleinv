@@ -58,6 +58,7 @@ def gen_inv(args):
     playbook_filename=os.path.join(mysql_dict['workdir'],'mysql_'+ mysql_dict['uuid']+'.yml')
     host_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['uuid'],'hosts')
     setting_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['uuid'],'pillar','mysql.yml')
+    ansible_auth=''
     if mysql_dict['sshpass']:
         ansible_auth='ansible_ssh_pass={}'.format(mysql_dict['sshpass'])
     elif mysql_dict['sshkey']:

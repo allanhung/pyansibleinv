@@ -64,6 +64,7 @@ def gen_inv(args):
     pxc_dict['parted']='' if args['--without_parted'] else '\n    - parted'
     pxc_dict['enable_backup']=not args['--without_backup']
 
+    ansible_auth=''
     if pxc_dict['sshpass']:
         ansible_auth='ansible_ssh_pass={}'.format(pxc_dict['sshpass'])
     elif pxc_dict['sshkey']:
