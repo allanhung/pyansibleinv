@@ -69,7 +69,7 @@ def gen_inv(args):
         mmm_dict['uuid']=str(uuid.uuid4())
     if mmm_dict['sshpass']:
         ansible_auth='ansible_ssh_pass={}'.format(mmm_dict['sshpass'])
-    else:
+    elif mmm_dict['sshkey']:
         ansible_auth='ansible_ssh_private_key_file={}'.format(mmm_dict['sshkey'])
 
     playbook_filename=os.path.join(mmm_dict['workdir'],'mmm_'+ mmm_dict['uuid']+'.yml')

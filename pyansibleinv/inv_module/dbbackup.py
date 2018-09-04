@@ -69,7 +69,7 @@ def dbbackup(args, func_type, fields):
     host_filename=os.path.join(backup_dict['workdir'],'inventory',backup_dict['uuid'],'hosts')
     if backup_dict['sshpass']:
         ansible_auth='ansible_ssh_pass={}'.format(backup_dict['sshpass'])
-    else:
+    elif backup_dict['sshkey']:
         ansible_auth='ansible_ssh_private_key_file={}'.format(backup_dict['sshkey'])
 
     host_list=[]

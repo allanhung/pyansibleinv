@@ -82,7 +82,7 @@ def gen_inv(args):
     setting_filename=os.path.join(mysql_dict['workdir'],'inventory',mysql_dict['uuid'],'pillar','mysql.yml')
     if mysql_dict['sshpass']:
         ansible_auth='ansible_ssh_pass={}'.format(mysql_dict['sshpass'])
-    else:
+    elif mysql_dict['sshkey']:
         ansible_auth='ansible_ssh_private_key_file={}'.format(mysql_dict['sshkey'])
     hosts_script.append('{:<40}{:<40}{:<50} ansible_ssh_port={:<7} ansible_ssh_user=centos ansible_become=true ansible_become_user=root ansible_become_method=sudo {}'.format(mysql_dict['hostname']+'.useast1.aws', 'ansible_ssh_host='+mysql_dict['ip'], ansible_auth,str(mysql_dict['sshport']), mysql_dict['hostarg']))
     logger.info('create ansible hosts: {}'.format(host_filename))

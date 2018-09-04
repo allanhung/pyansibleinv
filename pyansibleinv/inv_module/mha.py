@@ -66,7 +66,7 @@ def gen_inv(args):
 
     if mha_dict['sshpass']:
         ansible_auth='ansible_ssh_pass={}'.format(mha_dict['sshpass'])
-    else:
+    elif mha_dict['sshkey']:
         ansible_auth='ansible_ssh_private_key_file={}'.format(mha_dict['sshkey'])
     log_filename=os.path.join(mha_dict['workdir'],'mha_'+ mha_dict['uuid']+'.log')
     logger = common.MyLogger('mha', log_filename).default_logger.logger
