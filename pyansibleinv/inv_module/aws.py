@@ -4,7 +4,7 @@
 generate ansible inventory for mysql single instance
 
 Usage:
-  pyansibleinv aws [--database DATABASE] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--taskid TASKID]
+  pyansibleinv aws [--database DATABASE] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--hostarg HOSTARG] [--ssh_try_limit SSHLIMIT] [--taskid TASKID]
 
 Options:
   -h --help                 Show this screen.
@@ -13,6 +13,7 @@ Options:
   --workdir WORKDIR         Working Directory [default: /opt/ansible]
   --sshpass SSHPASS         Ansible ssh password
   --sshport SSHPORT         Ansible ssh port [default: 22]
+  --hostarg HOSTARG         Ansible hosts additional arguments
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
   --ssh_try_limit SSHLIMIT  Wait time for ssh reachable [default: 1800]
   --taskid TASKID           Task id for create mysql single instance
@@ -83,7 +84,7 @@ def gen_inv(args):
         ansible_auth='ansible_ssh_pass={}'.format(mysql_dict['sshpass'])
     else:
         ansible_auth='ansible_ssh_private_key_file={}'.format(mysql_dict['sshkey'])
-    hosts_script.append('{:<40}{:<40}{:<50} ansible_ssh_port={:<7} ansible_ssh_user=centos ansible_become=true ansible_become_user=root ansible_become_method=sudo'.format(mysql_dict['hostname']+'.useast1.aws', 'ansible_ssh_host='+mysql_dict['ip'], ansible_auth,str(mysql_dict['sshport'])))
+    hosts_script.append('{:<40}{:<40}{:<50} ansible_ssh_port={:<7} ansible_ssh_user=centos ansible_become=true ansible_become_user=root ansible_become_method=sudo {}'.format(mysql_dict['hostname']+'.useast1.aws', 'ansible_ssh_host='+mysql_dict['ip'], ansible_auth,str(mysql_dict['sshport']), mysql_dict['hostarg']))
     logger.info('create ansible hosts: {}'.format(host_filename))
     common.render_template('\n'.join(hosts_script),{},host_filename)
     logger.info('craete ansible playbooks: {}'.format(playbook_filename))

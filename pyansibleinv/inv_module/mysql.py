@@ -4,7 +4,7 @@
 generate ansible inventory for mysql single instance
 
 Usage:
-  pyansibleinv mysql [--database DATABASE] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--taskid TASKID] [--template_only] [--without_backup] --hostname HOSTNAME --ip IP
+  pyansibleinv mysql [--database DATABASE] [--password PASSWORD] [--workdir WORKDIR] [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--hostarg HOSTARG] [--ssh_try_limit SSHLIMIT] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--taskid TASKID] [--template_only] [--without_backup] --hostname HOSTNAME --ip IP
 
 Arguments:
   --hostname HOSTNAME       MySQL single instance hostname
@@ -20,6 +20,7 @@ Options:
   --sshpass SSHPASS         Ansible ssh password
   --sshport SSHPORT         Ansible ssh port [default: 22]
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
+  --hostarg HOSTARG         Ansible hosts additional arguments
   --ssh_try_limit SSHLIMIT  test count for ssh reachable (socket timeout is 5 sec) [default: 120]
   --taskid TASKID           Task id for create mysql single instance
   --template_only           Generate template only
@@ -61,7 +62,7 @@ def gen_inv(args):
         ansible_auth='ansible_ssh_pass={}'.format(mysql_dict['sshpass'])
     else:
         ansible_auth='ansible_ssh_private_key_file={}'.format(mysql_dict['sshkey'])
-    hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{}'.format(mysql_dict['hostname'], 'ansible_ssh_host='+mysql_dict['ip'], str(mysql_dict['sshport']), ansible_auth))
+    hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{} {}'.format(mysql_dict['hostname'], 'ansible_ssh_host='+mysql_dict['ip'], str(mysql_dict['sshport']), ansible_auth, mysql_dict['hostarg']))
 
     logger.info('create ansible hosts: {}'.format(host_filename))
     common.render_template('\n'.join(hosts_script),{},host_filename)

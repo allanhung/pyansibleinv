@@ -4,10 +4,10 @@
 database backup scheduler setting
 
 Usage:
-  pyansibleinv dbbackup enable [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--minute MINUTE] [--hour HOUR] [--day DAY] [--month MONTH] [--day_of_week DAYOFWEEK] [--rsets RSETS] [--isets ISETS] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
-  pyansibleinv dbbackup disable [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
-  pyansibleinv dbbackup status [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
-  pyansibleinv dbbackup listx [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
+  pyansibleinv dbbackup enable [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--hostarg HOSTARG] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--minute MINUTE] [--hour HOUR] [--day DAY] [--month MONTH] [--day_of_week DAYOFWEEK] [--rsets RSETS] [--isets ISETS] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
+  pyansibleinv dbbackup disable [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--hostarg HOSTARG] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
+  pyansibleinv dbbackup status [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--hostarg HOSTARG] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
+  pyansibleinv dbbackup listx [--sshpass SSHPASS] [--sshport SSHPORT] [--sshkey SSHKEY] [--hostarg HOSTARG] [--ssh_try_limit SSHLIMIT] [--workdir WORKDIR] [--taskid TASKID] [--cluster_id CLUSTERID] [--service_name SRVNAME] [--tenant TENANT] [--template_only] --dbtype DBTYPE --data_host DATAHOSTS --dbfqdn DBFQDN
 
 Arguments:
   --dbtype DBTYPE           Database type (e.q. mysql, mysql_mha, mssql, mssql_alwayson)
@@ -19,6 +19,7 @@ Options:
   --sshpass SSHPASS         Ansible ssh password
   --sshport SSHPORT         Ansible ssh port [default: 22]
   --sshkey SSHKEY           Ansible ssh key file [default: /opt/ansible/db.pem]
+  --hostarg HOSTARG         Ansible hosts additional arguments
   --ssh_try_limit SSHLIMIT  test count for ssh reachable (socket timeout is 5 sec) [default: 3]
   --cluster_id CLUSTERID    Cluster id
   --service_name SRVNAME    Service Name
@@ -78,7 +79,7 @@ def dbbackup(args, func_type, fields):
         k=k.lower()
         host_list.append(k)
         ip_list.append(v)
-        hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{}'.format(k, 'ansible_ssh_host='+v, str(backup_dict['sshport']), ansible_auth))
+        hosts_script.append('{:<60}{:<60}ansible_ssh_port={:<7}{} {}'.format(k, 'ansible_ssh_host='+v, str(backup_dict['sshport']), ansible_auth, backup_dict['hostarg']))
 
     logger.info('create ansible hosts: {}'.format(host_filename))
     common.render_template('\n'.join(hosts_script),{},host_filename)
